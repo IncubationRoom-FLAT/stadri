@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STARTUP DREAMER - Official Edition</title>
+    <style>
+    /* 1. 基本設定 & カラー変数 */
+    :root { 
+        --bg: #0a0b1e; --card: #161b33; --primary: #00f2ff; 
+        --accent: #ff007a; --text: #ffffff; --gold: #ffd700; 
+    }
+    
+    body { 
+        font-family: sans-serif; background-color: var(--bg); color: var(--text); 
+        margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; 
+        display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* 2. 画面（Screen）の共通設定：基本は隠す */
+    .screen { 
+        display: none; /* 基本は非表示 */
+        width: 95%; max-width: 800px; 
+        background: var(--card); padding: 40px 20px; 
+        border-radius: 20px; border: 2px solid var(--primary); 
+        box-sizing: border-box; position: relative; margin: 20px auto;
+        text-align: center;
+    }
+
+    /* 3. 表示中の画面だけを中央寄せにする (ここが重要) */
+    .screen.active,
+    .screen[style*="display: block"],
+    #title-screen.active { 
+        display: flex !important; 
+        flex-direction: column; 
+        align-items: center; 
+    }
+
+    /* 4. タイトル画面専用（背景なし・中央配置） */
+    #title-screen { border: none; background: transparent; min-height: 80vh; justify-content: center; }
+    .title-logo { 
+        font-size: 4rem; font-weight: 900; color: var(--primary); 
+        text-shadow: 0 0 15px var(--primary); line-height: 1.1; margin-bottom: 50px; 
+    }
+
+    /* 5. 全体の文字・ボタン・入力欄を巨大化（改行防止版） */
+h2 { font-size: 2.8rem; color: var(--gold); margin-bottom: 25px; white-space: nowrap; }
+h3 { font-size: 2rem; margin-bottom: 20px; }
+p, li, label, div, span { font-size: 1.5rem; line-height: 1.5; }
+
+.main-btn, .next-btn { 
+    background: var(--primary); color: #000; border: none; 
+    padding: 20px 30px; /* 左右の余白を少し調整 */
+    border-radius: 50px; font-weight: bold; 
+    font-size: 1.8rem; 
+    
+    /* 改行を絶対に許さない設定 */
+    white-space: nowrap; 
+    width: auto;           /* 固定幅をやめる */
+    min-width: 280px;      /* 最低限の幅は確保 */
+    max-width: 95%;        /* 画面からはみ出さない */
+    
+    margin: 15px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+input[type="text"], input[type="number"], select { 
+    background: #000; border: 1px solid var(--primary); color: white; 
+    padding: 15px; border-radius: 10px; 
+    width: 90%; max-width: 500px; 
+    font-size: 1.8rem; text-align: center; margin: 15px 0;
+}
+
+    /* 6. スロット・ルーレットの巨大化 */
+    .slot-container { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
+    .slot-reel-window { 
+        width: 140px; height: 160px; overflow: hidden; 
+        background: #fff; border: 5px solid var(--gold); border-radius: 10px; 
+    }
+    .slot-char { height: 160px; display: flex; align-items: center; justify-content: center; }
+    .slot-char img { width: 130px; height: 130px; object-fit: contain; }
+
+    #roulette-board { 
+        width: 350px !important; height: 350px !important; 
+        background: white; border: 10px solid var(--gold); border-radius: 50%; 
+    }
+    #g-info, #roulette-msg { font-size: 1.8rem; font-weight: bold; margin: 20px 0; }
+
+    /* --- お題箱：さらに巨大化＆はみ出し防止 --- */
+    #odai-box {
+        display: flex !important; 
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: #000;
+        min-height: 250px;    /* 高さをさらにアップ */
+        width: 100%;          /* 画面横幅いっぱいまで許可 */
+        max-width: 750px;     /* 最大幅をさらに広げる */
+        border: 6px solid var(--gold); /* 枠も太くして存在感アップ */
+        border-radius: 25px;
+        margin: 20px auto;
+        padding: 40px;        /* 中の余白を広げる */
+        cursor: pointer;
+        text-align: center;
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        box-sizing: border-box; 
+        overflow: hidden;     /* はみ出しをカット */
+    }
+
+    #odai-text {
+        font-size: 3rem !important; /* 文字をさらに巨大化 */
+        font-weight: bold;
+        color: #fff;
+        margin: 0;
+        
+        /* 重要：改行を許可し、横へのはみ出しを防ぐ */
+        white-space: normal !important; 
+        word-wrap: break-word !important; 
+        overflow-wrap: break-word !important;
+        line-height: 1.3;
+        width: 100%;
+    }
+
+    #odai-box span {
+        font-size: 1.4rem;
+        color: var(--gold);
+        margin-top: 20px;
+    }
+
+    /* 7. その他要素の調整 */
+    .rule-scroll { text-align: left; background: rgba(0,0,0,0.5); padding: 25px; border-radius: 15px; width: 100%; box-sizing: border-box; }
+    ul { display: inline-block; text-align: left; }
+    .investment-row { width: 100%; padding: 15px; font-size: 1.5rem; }
+    .back-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.1); padding: 10px 20px; font-size: 1rem; border-radius: 10px; }
+    /* --- 「ルールを確認」ボタンの色をピンクに修正 --- */
+    /* タイトル画面の2番目のボタンや、accent-btnクラスを持つものを対象にします */
+    .accent-btn, 
+    #title-screen .main-btn:nth-of-type(2) {
+        background: var(--accent) !important;
+        color: white !important;
+    }
+    /* --- タイマーデザインの復活と強化 --- */
+.timer-display {
+    font-size: 6rem !important; /* さらに巨大化 */
+    font-weight: 900;
+    color: var(--primary);
+    text-align: center;
+    margin: 30px 0;
+    font-family: 'Courier New', Courier, monospace; /* デジタル感 */
+    text-shadow: 0 0 20px var(--primary), 0 0 40px var(--primary); /* 強烈な発光演出 */
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px 40px;
+    border-radius: 20px;
+    border: 3px solid var(--primary);
+    box-shadow: inset 0 0 15px var(--primary);
+    width: auto;
+    display: inline-block;
+}
+
+/* 残り時間が少なくなった時のアラート（任意でJSからクラス追加用） */
+.timer-low {
+    color: var(--accent) !important;
+    text-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent) !important;
+    border-color: var(--accent) !important;
+    box-shadow: inset 0 0 15px var(--accent) !important;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div id="title-screen" class="screen active">
+        <div class="title-logo">STARTUP<br>DREAMER</div>
+        <button class="next-btn accent-btn" onclick="goTo('rule-screen')">ルールを確認</button>
+        <button class="next-btn" onclick="goTo('setup-screen')">ゲームスタート</button>
+    </div>
+
+    <div id="rule-screen" class="screen">
+    <button class="back-btn" onclick="goTo('title-screen')">← タイトル</button>
+    <center>
+        <h2 style="color:var(--primary); margin:10px 0 5px 0; font-size: 1.5rem;">STARTUP DREAMER</h2>
+        <p style="color:var(--gold); font-size: 0.8rem; margin-bottom: 15px;">- OFFICIAL RULE BOOK -</p>
+    </center>
+
+    <div class="rule-scroll">
+        <div class="rule-item">
+            <h4>1. ゲームの目的</h4>
+            <p>全3ラウンド終了時に、最も多くの<span class="highlight">「スターコイン（総資産）」</span>を築き上げたプレイヤーが勝者です。</p>
+        </div>
+
+        <div class="rule-item">
+            <h4>2. ラウンドの流れ</h4>
+            <ol style="padding-left: 20px; margin: 5px 0;">
+                <li><strong>アイデア考案:</strong> お悩みを解決する案を考えます（目安:3分）。</li>
+                <li><strong>プレゼン:</strong> 他のプレイヤーへ熱く伝えます（目安:1分）。</li>
+                <li><strong>投資タイム:</strong> 有望なアイデアにチップを投じます。</li>
+                <li><strong>運命の判定:</strong> 支援額により成功確率が決まります。</li>
+            </ol>
+        </div>
+
+        <div class="rule-item">
+            <h4>3. 投資のルール</h4>
+            <p>ラウンドが進むごとに合計投資枠が増えていきます。</p>
+            <ul style="padding-left: 20px; margin: 5px 0;">
+                <li><span class="highlight">R1: 合計3枚 / R2: 合計6枚 / R3: 合計9枚</span></li>
+                <li>1人のプレイヤーへの投資は<span class="highlight">最大3枚</span>まで。</li>
+            </ul>
+        </div>
+
+        <div class="rule-item">
+            <h4>4. 支援額と成功確率</h4>
+            <table style="width:100%; border-collapse: collapse; font-size: 0.75rem; text-align: center; margin-top: 5px;">
+                <tr style="background: rgba(0,242,255,0.2);">
+                    <th style="border: 1px solid var(--primary); padding: 4px;">支援額</th>
+                    <th style="border: 1px solid var(--primary); padding: 4px;">確率</th>
+                    <th style="border: 1px solid var(--primary); padding: 4px;">状況</th>
+                </tr>
+                <tr><td style="border: 1px solid #333;">0枚</td><td style="border: 1px solid #333;">約9%</td><td style="border: 1px solid #333; text-align: left;">奇跡を祈る</td></tr>
+                <tr><td style="border: 1px solid #333;">1枚</td><td style="border: 1px solid #333;">約52%</td><td style="border: 1px solid #333; text-align: left;">五分五分の勝負</td></tr>
+                <tr><td style="border: 1px solid #333;">3枚</td><td style="border: 1px solid #333;">約75%</td><td style="border: 1px solid #333; text-align: left;">有望な事業</td></tr>
+                <tr><td style="border: 1px solid #333;">6枚</td><td style="border: 1px solid #333;">約86%</td><td style="border: 1px solid #333; text-align: left;">かなり堅実</td></tr>
+                <tr><td style="border: 1px solid #333;">9枚</td><td style="border: 1px solid #333;">約90%</td><td style="border: 1px solid #333; text-align: left;">市場の覇者</td></tr>
+            </table>
+        </div>
+
+        <div class="rule-item">
+            <h4>5. 報酬とペナルティ</h4>
+            <p><strong style="color:var(--primary);">【成功時 (SUCCESS!!)】</strong></p>
+            <ul style="padding-left: 20px; margin: 5px 0;">
+                <li><strong>プレゼンター:</strong> 投資額の<span class="highlight">2倍</span>を獲得。支援0なら<span class="highlight">3枚</span>獲得。</li>
+                <li><strong>投資家:</strong> 投資した額が<span class="highlight">3倍</span>になって戻る。</li>
+            </ul>
+            <p><strong style="color:var(--accent);">【失敗時 (FAILURE...)】</strong></p>
+            <p style="padding-left: 10px;">全員報酬ゼロ。チップもすべて没収されます。</p>
+        </div>
+
+        <div class="rule-item">
+            <h4>6. 借金リバイバル</h4>
+            <p>資産0以下の時、プレゼン前にモードを選択します。</p>
+            <table style="width:100%; border-collapse: collapse; font-size: 0.75rem; text-align: center; margin-top: 5px;">
+                <tr style="background: rgba(255,0,122,0.2);">
+                    <th style="border: 1px solid var(--accent); padding: 4px;">モード</th>
+                    <th style="border: 1px solid var(--accent); padding: 4px;">成功率</th>
+                    <th style="border: 1px solid var(--accent); padding: 4px;">報酬</th>
+                </tr>
+                <tr><td style="border: 1px solid #333;">High水の陣</td><td style="border: 1px solid #333;">半減</td><td style="border: 1px solid #333;">4倍</td></tr>
+                <tr><td style="border: 1px solid #333;">苦Lowの道</td><td style="border: 1px solid #333;">通常</td><td style="border: 1px solid #333;">2倍</td></tr>
+            </table>
+        </div>
+    </div>
+    <center><button class="main-btn" onclick="goTo('setup-screen')">設定へ進む</button></center>
+</div>
+
+    <div id="setup-screen" class="screen">
+        <button class="back-btn" onclick="goTo('title-screen')">← タイトル</button>
+        <h2 style="color:var(--primary); margin-top:20px; text-align:center;">⚙️ ゲーム設定</h2>
+        <div style="margin-bottom:15px;">人数: <input type="number" id="num-players" value="4" min="2" max="6" oninput="generateInputs()" style="width:70px;"></div>
+        <div id="name-area" style="margin-bottom:15px;"></div>
+        <button class="next-btn accent-btn" style="max-width:none;" onclick="initGame()">ゲーム開始！</button>
+    </div>
+
+    <div id="confirm-all-screen" class="screen">
+        <button id="back-confirm" class="back-btn" onclick="confirmBack()">← 戻る</button>
+        <h2 id="round-label-confirm" style="text-align:center; margin-top:20px;">ROUND 1</h2>
+        <p style="text-align:center; color:var(--gold);">【お題の事前確認】長押しで表示</p>
+        <p style="text-align:center;"><strong id="confirm-name" style="color:var(--primary); font-size:1.5rem;"></strong> さん</p>
+        <div id="odai-box" onmousedown="showOdai()" onmouseup="hideOdai()" ontouchstart="showOdai()" ontouchend="hideOdai()"></div>
+        <button id="confirm-done-btn" class="next-btn" style="max-width:none;" onclick="nextConfirm()">確認しました</button>
+    </div>
+
+    <div id="thinking-screen" class="screen">
+    <h2 style="text-align:center; color:var(--gold); margin-top:20px;">💡 Thinking Time</h2>
+    
+    <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin: 20px 0; width: 100%;">
+        <button class="mode-btn" style="width:50px; height:50px; padding:0; font-size:1.5rem; display:flex; align-items:center; justify-content:center;" onclick="adjustTime(-30)">−</button>
+        
+        <div id="think-timer" class="timer-display" style="margin: 0; min-width: 150px; flex: none;">03:00</div>
+        
+        <button class="mode-btn" style="width:50px; height:50px; padding:0; font-size:1.5rem; display:flex; align-items:center; justify-content:center;" onclick="adjustTime(30)">+</button>
+    </div>
+
+    <center>
+        <button class="main-btn" id="timer-toggle-btn" onclick="toggleTimer()" style="width:auto; padding: 10px 30px; margin-bottom:10px;">スタート</button>
+    </center>
+    <button class="next-btn accent-btn" style="max-width:none;" onclick="stopTimer(); db.pIdx=0; showPitch();">プレゼンを開始する</button>
+    </div>
+
+    <div id="pitch-screen" class="screen">
+        <button id="back-pitch" class="back-btn" onclick="pitchBack()">← 戻る</button>
+        <h2 style="color:var(--accent); text-align:center; margin-top:20px;">🎤 プレゼン</h2>
+        <p style="text-align:center;"><strong id="pitch-name" style="color:var(--primary); font-size:2rem;"></strong></p>
+        <div id="revival-ui" style="display:none; border:2px solid var(--accent); padding:15px; border-radius:15px; margin-bottom:15px;">
+            <p style="color:var(--accent); font-weight:bold; margin:0;">📉 借金リバイバル</p>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button id="m-low" class="mode-btn" onclick="setMode('Low')">苦Low</button>
+                <button id="m-high" class="mode-btn" onclick="setMode('High')">High水の陣</button>
+            </div>
+        </div>
+        <button id="pitch-done-btn" class="next-btn accent-btn" style="max-width:none;" onclick="nextPitch()">プレゼン終了</button>
+    </div>
+
+    <div id="invest-screen" class="screen">
+        <button id="back-invest" class="back-btn" onclick="investBack()">← 戻る</button>
+        <h2 style="text-align:center; margin-top:20px;">💰 投資タイム</h2>
+        <p id="inv-who" style="text-align:center; color:var(--gold); font-weight:bold;"></p>
+        <p id="inv-limit-info" style="text-align:center; font-size:0.8rem;"></p>
+        <div id="inv-list"></div>
+        <button class="next-btn" style="max-width:none;" onclick="saveInv()">投資を確定</button>
+    </div>
+
+    <div id="gacha-screen" class="screen">
+    <h2 id="g-name" style="text-align:center; color:var(--gold);"></h2>
+    
+    <div style="margin: 15px 0; background: #000; height: 25px; border-radius: 15px; border: 2px solid #333; position: relative; overflow: hidden;">
+        <div id="g-rate-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--primary)); transition: width 0.5s;"></div>
+        <div id="g-rate-text" style="position: absolute; width: 100%; text-align: center; line-height: 22px; font-weight: bold; font-size: 0.8rem;">成功確率: 0%</div>
+    </div>
+
+    <div id="slot-area" class="slot-container">
+        <div class="slot-reel-window"><div id="reel-0" class="slot-reel"></div></div>
+        <div class="slot-reel-window"><div id="reel-1" class="slot-reel"></div></div>
+        <div class="slot-reel-window"><div id="reel-2" class="slot-reel"></div></div>
+    </div>
+
+    <div id="roulette-area" style="display:none; flex-direction:column; align-items:center; margin: 20px 0;">
+    <div id="roulette-board" style="width: 280px; height: 280px; border-radius: 50%; border: 10px solid var(--gold); position: relative; background: radial-gradient(#fff, #f0f0f0); overflow: hidden; box-shadow: 0 0 25px rgba(0,0,0,0.3);">
+        
+        <div id="roulette-grid" style="position:absolute; width:100%; height:100%; opacity: 0.1;"></div>
+        
+        <div id="roulette-chars-container" style="position:absolute; width:100%; height:100%; z-index: 2;"></div>
+
+        <div id="roulette-needle" style="position:absolute; top:0; left:calc(50% - 4px); width:8px; height:50%; background:#ff4d4d; transform-origin: bottom; border-radius: 10px; z-index:100; box-shadow: 0 0 5px rgba(0,0,0,0.2);">
+            <div style="width:0; height:0; border-left:12px solid transparent; border-right:12px solid transparent; border-bottom:24px solid #ff4d4d; position:absolute; top:-20px; left:-8px;"></div>
+        </div>
+
+        <div style="position:absolute; top:50%; left:50%; width:30px; height:30px; background:var(--gold); border-radius:50%; transform:translate(-50%,-50%); z-index:101; border: 3px solid #fff;"></div>
+    </div>
+    <div id="roulette-msg" style="margin-top:15px; font-weight:bold; color:var(--gold); font-size:1.2rem; min-height: 1.5em;"></div>
+</div>
+    
+    <div id="g-info" style="text-align:center; color:var(--primary); font-weight:bold; margin-bottom:20px; min-height: 3em;"></div>
+
+    <center>
+        <button class="main-btn accent-btn" id="roll-btn" onclick="roll()">運命の判定！</button>
+        <button class="next-btn" id="next-g-btn" style="display:none;" onclick="nextG()">次へ進む</button>
+    </center>
+</div>
+
+    <div id="end-screen" class="screen">
+        <h2 style="text-align:center; color:var(--gold);">🏆 結果発表</h2>
+        <div id="rank-list"></div>
+        <button class="next-btn" style="max-width:none;" onclick="location.reload()">タイトルへ</button>
+    </div>
+</div>
+
+<script>
+const ODAIS = {
+    "ファミリー": ["家事や育児がワンオペになりがち","子どもの自主性の伸ばし方がわからない","無駄な出費を減らしたい","遠方の親の見守りが不十分","習い事の送り迎えが大変"],
+    "ヤングアダルト": ["本当にやりたいことがわからない","最初の一歩が踏み出せない","SNS疲れ・ストレス","お金がない","都会の一人暮らしの孤独"],
+    "ビジネス層": ["ランチ後の眠気","満員電車のストレス","部下育成の悩み","出張の予約トラブル","自分に合うスキルが不明"],
+    "シニア層": ["健康維持への不安","孤独感・話し相手不足","デジタルの壁","詐欺への不安","遺品管理の心配"],
+    "ユニーク": ["足のむくみ","ペットと長期外出したい","方向音痴で迷う","掃除が苦手で物が溜まる","運動会が憂鬱"]
+};
+
+let db = { players: [], curR: 1, pIdx: 0, invIdx: 0, invests: [], modes: [], invLog: [], playerOdai: [] };
+let globalOdaiPool = [];
+let timerObj = null;
+let timeLeft = 180;
+
+function goTo(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0,0);
+}
+
+function generateInputs() {
+    const n = document.getElementById('num-players').value;
+    const area = document.getElementById('name-area');
+    area.innerHTML = "";
+    for(let i=1; i<=n; i++) area.innerHTML += `<div style="margin-bottom:8px;"><input type="text" id="pn-${i}" placeholder="プレイヤー ${i} の名前"></div>`;
+}
+generateInputs();
+
+function initGame() {
+    const n = parseInt(document.getElementById('num-players').value);
+    db.players = [];
+    for(let i=1; i<=n; i++) {
+        db.players.push({ id: i-1, name: document.getElementById(`pn-${i}`).value || `P${i}`, sc: 3, debt: 0 });
+    }
+    db.curR = 1;
+
+    // --- ここを追加：お題の山札（プール）を作成 ---
+    globalOdaiPool = [];
+    Object.keys(ODAIS).forEach(cat => {
+        ODAIS[cat].forEach(prob => {
+            globalOdaiPool.push({cat, prob});
+        });
+    });
+    // 山札をシャッフル
+    globalOdaiPool.sort(() => Math.random() - 0.5);
+
+    startR();
+}
+
+function startR() {
+    db.pIdx = 0;
+    db.invests = new Array(db.players.length).fill(0);
+    db.modes = new Array(db.players.length).fill('Low');
+    db.invLog = [];
+    db.playerOdai = [];
+
+    db.players.forEach(p => {
+        if(p.sc <= 0) p.debt += 1;
+
+        // 山札が空になったら再補充（予備）
+        if (globalOdaiPool.length === 0) {
+            Object.keys(ODAIS).forEach(cat => {
+                ODAIS[cat].forEach(prob => globalOdaiPool.push({cat, prob}));
+            });
+            globalOdaiPool.sort(() => Math.random() - 0.5);
+        }
+        
+        // 山札から1枚抜き取る（これで被りなし！）
+        db.playerOdai.push(globalOdaiPool.pop());
+    });
+    showConfirm();
+}
+
+function showConfirm() {
+    const p = db.players[db.pIdx];
+    document.getElementById('round-label-confirm').innerText = `ROUND ${db.curR}`;
+    document.getElementById('confirm-name').innerText = p.name;
+    document.getElementById('odai-box').innerHTML = "";
+    goTo('confirm-all-screen');
+}
+
+function nextConfirm() {
+    if(db.pIdx < db.players.length - 1) { db.pIdx++; showConfirm(); }
+    else { startThinking(); }
+}
+
+function confirmBack() {
+    if(db.pIdx > 0) { db.pIdx--; showConfirm(); }
+    else { goTo('setup-screen'); }
+}
+
+function adjustTime(amount) {
+    let newTime = timeLeft + amount;
+    
+    // 180秒(3分)より小さくならず、600秒(10分)より大きくならないように制限
+    if (newTime < 180) newTime = 180;
+    if (newTime > 600) newTime = 600;
+    
+    timeLeft = newTime;
+    updateTimerDisplay();
+}
+
+function startThinking() {
+    // 毎回3分(180秒)にリセットしたい場合はここを 180 にする
+    // 前のラウンドの残り時間を引き継ぎたいなら、この行を消す
+    timeLeft = 180; 
+    
+    updateTimerDisplay();
+    document.getElementById('timer-toggle-btn').innerText = "スタート";
+    goTo('thinking-screen');
+}
+
+function toggleTimer() {
+    if (timerObj) { stopTimer(); document.getElementById('timer-toggle-btn').innerText = "再開"; }
+    else {
+        document.getElementById('timer-toggle-btn').innerText = "一時停止";
+        timerObj = setInterval(() => {
+            timeLeft--; updateTimerDisplay();
+            if (timeLeft <= 0) { stopTimer(); alert("タイムアップ！"); }
+        }, 1000);
+    }
+}
+
+function stopTimer() { clearInterval(timerObj); timerObj = null; }
+
+function updateTimerDisplay() {
+    const m = Math.floor(timeLeft / 60); const s = timeLeft % 60;
+    document.getElementById('think-timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function showPitch() {
+    const p = db.players[db.pIdx];
+    document.getElementById('pitch-name').innerText = p.name;
+    document.getElementById('revival-ui').style.display = (p.sc <= 0) ? 'block' : 'none';
+    setMode('Low');
+    goTo('pitch-screen');
+}
+
+function nextPitch() {
+    if(db.pIdx < db.players.length - 1) { db.pIdx++; showPitch(); }
+    else { db.invIdx = 0; showI(); }
+}
+
+function pitchBack() {
+    if(db.pIdx > 0) { db.pIdx--; showPitch(); }
+    else { startThinking(); }
+}
+
+function showI() {
+    const inv = db.players[db.invIdx];
+    if(inv.sc <= 0) { skipI(); return; }
+    const walletLimit = db.curR * 3;
+    document.getElementById('inv-who').innerText = `${inv.name} さんの投資 (残:${inv.sc}枚)`;
+    document.getElementById('inv-limit-info').innerText = `今R枠: 合計${walletLimit}枚 / 1人最大3枚まで`;
+    let html = "";
+    db.players.forEach((p, i) => { if(i !== db.invIdx) html += `<div class="investment-row"><span>${p.name} へ</span> <input type="number" class="iv" data-to="${i}" value="0" min="0" max="3" style="width:60px; background:#000; color:#fff; border:1px solid var(--primary); text-align:center;"></div>`; });
+    document.getElementById('inv-list').innerHTML = html;
+    goTo('invest-screen');
+}
+
+function saveInv() {
+    const inv = db.players[db.invIdx];
+    const inputs = document.querySelectorAll('.iv');
+    const walletLimit = db.curR * 3;
+    let sum = 0; inputs.forEach(i => sum += parseInt(i.value || 0));
+    if(sum > walletLimit || sum > inv.sc) { alert("投資枠または所持金が足りません"); return; }
+    inputs.forEach(i => {
+        let v = parseInt(i.value || 0); let to = parseInt(i.dataset.to);
+        db.invests[to] += v;
+        db.invLog.push({from:db.invIdx, to, amt:v});
+        inv.sc -= v;
+    });
+    skipI();
+}
+
+function skipI() {
+    db.invIdx++;
+    // 全員の投資が終わったかチェック
+    if(db.invIdx < db.players.length) {
+        showI(); // 次の人の投資画面へ
+    } else {
+        db.pIdx = 0; // 判定のためにプレイヤーインデックスを0に戻す
+        showG(); // スロット（判定）画面へ進む
+    }
+}
+
+function investBack() {
+    if(db.invIdx > 0) { db.invIdx--; showI(); }
+    else { db.pIdx = db.players.length - 1; showPitch(); }
+}
+
+function showOdai() {
+    const odai = db.playerOdai[db.pIdx];
+    document.getElementById('odai-box').innerHTML = `<div style="color:var(--primary); font-size:0.9rem;">ターゲット：${odai.cat}</div><div style="font-size:1.1rem; font-weight:bold;">${odai.prob}</div>`;
+}
+function hideOdai() { document.getElementById('odai-box').innerHTML = ""; }
+
+function setMode(m) {
+    db.modes[db.pIdx] = m;
+    document.getElementById('m-low').className = (m === 'Low' ? 'mode-btn selected' : 'mode-btn');
+    document.getElementById('m-high').className = (m === 'High' ? 'mode-btn selected' : 'mode-btn');
+}
+
+// ★★★ ここに使用する画像ファイル名を指定 ★★★
+const URL_SUCCESS = "S__14319664.jpg"; // 右の緑キャラ（成功）
+const URL_FAIL = "S__14319663.jpg";    // 左の赤キャラ（失敗）
+
+function showG() {
+    const p = db.players[db.pIdx];
+    if (!db.round) db.round = 1;
+    const currentRound = db.round;
+    
+    document.getElementById('g-name').innerText = `【Round ${currentRound}】 ${p.name}`;
+    document.getElementById('g-info').innerText = `集まった支援: ${db.invests[db.pIdx]} 枚`;
+    document.getElementById('roll-btn').style.display = "block";
+    document.getElementById('next-g-btn').style.display = "none";
+    
+    // showG 関数の中の currentRound === 2 のブロックを探してください
+if (currentRound === 2) {
+    document.getElementById('slot-area').style.display = 'none';
+    document.getElementById('roulette-area').style.display = 'flex';
+    
+    const container = document.getElementById('roulette-chars-container');
+    container.innerHTML = "";
+    
+    // 1. 今回の成功率を計算
+    const successRate = ((db.invests[db.pIdx] + 0.1) / (db.invests[db.pIdx] + 1.1)) * (db.modes[db.pIdx] === 'High' ? 0.5 : 1.0);
+    
+    // ★ここに追加します！★
+    // 2. 12個のうち、何個を成功キャラにするか決定
+    let winCount = Math.round(successRate * 12);
+    if(winCount === 0 && successRate > 0) winCount = 1; // 最低1個は成功を入れる
+    if(winCount === 12) winCount = 11; // どんなに高くても1個は失敗を入れる
+
+    // 3. 成功・失敗のリストを作成（winCountの数だけtrueを入れる）
+    let spotList = [];
+    for(let i = 0; i < 12; i++) {
+        spotList.push(i < winCount); 
+    }
+    // 配列をシャッフルして、成功と失敗をバラバラにする
+    spotList.sort(() => Math.random() - 0.5);
+
+    // 4. マスを配置
+    // showG 関数内のルーレット配置ループ
+    spotList.forEach((isWin, i) => {
+        const div = document.createElement('div');
+        div.style.cssText = `position:absolute; width:100%; height:100%; transform:rotate(${i * 30}deg); text-align:center;`;
+        div.innerHTML = `
+            <img src="${isWin ? URL_SUCCESS : URL_FAIL}" 
+                style="width:60px; height:60px; margin-top:15px; border-radius:50%; background:white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 3px solid ${isWin ? '#4CAF50' : '#FF5252'};" 
+                data-win="${isWin}">
+        `; // 画像サイズを 45px -> 60px にアップ
+        container.appendChild(div);
+    });
+
+    document.getElementById('roulette-msg').innerText = `成功マス: ${winCount} / 12`;
+}
+    else {
+        document.getElementById('slot-area').style.display = 'flex';
+        document.getElementById('roulette-area').style.display = 'none';
+    }
+    goTo('gacha-screen');
+}
+
+function roll() {
+    const p = db.players[db.pIdx];
+    const invAmt = db.invests[db.pIdx];
+    const mode = db.modes[db.pIdx];
+    const currentRound = db.round || 1;
+    
+    let probMult = (mode === 'High') ? 0.5 : 1.0;
+    let successRate = ((invAmt + 0.1) / (invAmt + 1.1)) * probMult;
+    
+    document.getElementById('roll-btn').style.display = "none";
+    const infoDisp = document.getElementById('g-info');
+
+    // --- 第2ラウンド：ルーレット演出 ---
+    if (currentRound === 2) {
+        const needle = document.getElementById('roulette-needle');
+        const spots = document.querySelectorAll('#roulette-chars-container div');
+        
+        // 盤面のキャラからランダムに1つ選ぶ（確率はshowGで反映済み）
+        const winningIdx = Math.floor(Math.random() * spots.length);
+        const winningSpot = spots[winningIdx];
+        const isWinResult = winningSpot.querySelector('img').getAttribute('data-win') === "true";
+
+        needle.style.transition = "none";
+        needle.style.transform = "rotate(0deg)";
+
+        setTimeout(() => {
+            const spins = 3600; 
+            const targetDeg = winningIdx * 30; // 12分割なので30度ずつ
+            const totalDeg = spins + targetDeg;
+
+            infoDisp.innerText = "運命のルーレット！！";
+            needle.style.transition = "transform 5s cubic-bezier(0.15, 0, 0.15, 1)";
+            needle.style.transform = `rotate(${totalDeg}deg)`;
+
+            setTimeout(() => finalizeGame(isWinResult), 5500);
+        }, 100);
+
+    } else {
+        // --- 第1・3ラウンド：ガチスロット演出（揃うまでループ） ---
+        const reels = [0, 1, 2].map(i => document.getElementById(`reel-${i}`));
+        
+        // メーターチャージ
+        let count = 0;
+        let chargeInterval = setInterval(() => {
+            count += 2;
+            if (count >= successRate * 100) {
+                clearInterval(chargeInterval);
+                startInfiniteSlot();
+            } else {
+                document.getElementById('g-rate-bar').style.width = count + "%";
+                document.getElementById('g-rate-text').innerText = "成功確率: " + count + "%";
+            }
+        }, 20);
+
+        async function startInfiniteSlot() {
+            let results = [];
+            infoDisp.innerText = "抽選開始...";
+
+            // 内部で1枚ずつ止めていく
+            for (let i = 0; i < 3; i++) {
+                const isWinTick = Math.random() < successRate;
+                const tickImg = isWinTick ? URL_SUCCESS : URL_FAIL;
+                results.push(tickImg);
+
+                // リールの中身をリセットして回転
+                let html = "";
+                for(let j=0; j<20; j++) {
+                    html += `<div class="slot-char"><img src="${Math.random() < 0.5 ? URL_SUCCESS : URL_FAIL}"></div>`;
+                }
+                html += `<div class="slot-char"><img src="${tickImg}"></div>`;
+                reels[i].innerHTML = html;
+                reels[i].style.transition = "none";
+                reels[i].style.transform = "translateY(0)";
+
+                // startInfiniteSlot 関数内のアニメーション部分
+        await new Promise(resolve => {
+            let duration = 0.5;
+            let delay = 700;
+            if (i === 2 && results[0] === results[1]) {
+                duration = 3.5;
+                delay = 4000;
+                infoDisp.innerText = "リーチ！！！";
+            }
+            setTimeout(() => {
+                reels[i].style.transition = `transform ${duration}s cubic-bezier(0.15, 0, 0.15, 1)`;
+                // ★ 120 を 160 に変更（CSSで設定した .slot-char の高さに合わせる）
+                const offset = (reels[i].children.length - 1) * 160; 
+                reels[i].style.transform = `translateY(-${offset}px)`;
+                setTimeout(resolve, delay);
+            }, 50);
+        });
+            }
+
+            // 判定：3つ揃ったか？
+            if (results[0] === results[1] && results[1] === results[2]) {
+                finalizeGame(results[0] === URL_SUCCESS);
+            } else {
+                infoDisp.innerText = "揃わなかった！再始動...";
+                setTimeout(startInfiniteSlot, 1200); // 揃うまでループ
+            }
+        }
+    }
+
+    // 共通の結果確定処理
+    function finalizeGame(win) {
+        if(!db.roundResults) db.roundResults = []; 
+        db.roundResults[db.pIdx] = { win: win };
+        if(win) {
+            db.players[db.pIdx].sc += (invAmt === 0) ? 3 : invAmt * (mode === 'High' ? 4 : 2);
+            db.invLog.filter(l => l.to == p.id).forEach(l => db.players[l.from].sc += l.amt * 3);
+            infoDisp.innerText = "SUCCESS!!";
+        } else {
+            infoDisp.innerText = "FAIL...";
+        }
+        document.getElementById('next-g-btn').style.display = "block";
+    }
+}
+
+function nextG() {
+    db.pIdx++;
+    if (db.pIdx < db.players.length) {
+        showG(); // 次のプレイヤーへ
+    } else {
+        // 全員終わったら、roundがなければ1、あれば+1
+        if (!db.round) db.round = 1;
+        db.round++; 
+        showRoundLog(); // 振り返り画面へ
+    }
+}
+
+function showRank() {
+    const sorted = [...db.players].sort((a,b) => (b.sc-b.debt) - (a.sc-a.debt));
+    document.getElementById('rank-list').innerHTML = sorted.map((p,i) => {
+        return `<div class="investment-row"><span>${i+1}位: <b>${p.name}</b></span><span class="highlight">${p.sc - p.debt}枚 <small style="color:#aaa;">(負債:${p.debt})</small></span></div>`;
+    }).join('');
+    goTo('end-screen');
+}
+
+// 振り返りログを表示する本体
+function showRoundLog() {
+    let html = "<h2>ROUND " + db.curR + " 振り返り</h2>";
+    db.players.forEach((p, i) => {
+        const invAmt = db.invests[i];
+        const mode = db.modes[i];
+        const res = db.roundResults[i];
+        
+        // 成功率の計算（公式ルール準拠 ）
+        let probMult = (mode === 'High') ? 0.5 : 1.0;
+        let rate = Math.round(((invAmt + 0.1) / (invAmt + 1.1)) * probMult * 100);
+        let resText = res.win ? "<b style='color:#00f2ff;'>成功</b>" : "<b style='color:#ff007a;'>失敗</b>";
+
+        html += `<div style="padding:10px; border-bottom:1px solid #444; text-align:left;">
+            <strong>${p.name}</strong>: 投資${invAmt}枚 (${rate}%) ➔ ${resText}
+        </div>`;
+    });
+
+    // 画面にログを浮かび上がらせる演出
+    const logDiv = document.createElement('div');
+    logDiv.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:#0a0b1e; z-index:9999; padding:20px; box-sizing:border-box; overflow-y:auto; text-align:center;";
+    logDiv.innerHTML = html + `<button onclick="this.parentElement.remove(); finishLog();" class="next-btn" style="margin-top:20px;">次へ進む</button>`;
+    document.body.appendChild(logDiv);
+}
+
+// ログを確認した後に次のラウンド（または終了）へ行く処理
+function finishLog() {
+    db.curR++;
+    if(db.curR > 3) showRank();
+    else startR();
+}
+
+</script>
+</body>
+</html>
