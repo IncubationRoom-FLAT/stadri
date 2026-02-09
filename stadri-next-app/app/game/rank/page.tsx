@@ -10,15 +10,18 @@ export default function RankPage() {
   return (
     <div className="container">
       <div id="rank-screen" className="screen active">
-          <h2>最終結果</h2>
-          <ol className="rank-list">
+          <h2>🏆 最終結果</h2>
+          <div className="ranking-container">
               {gameState.finalRanking?.map((p, i) => (
-                  <li key={i}>
-                      <span className="rank-name">{p.name}</span>
-                      <span className="rank-score">{p.score} SC</span>
-                  </li>
+                  <div key={i} className={`rank-card rank-${i + 1}`}>
+                      <div className="rank-position">{i + 1}</div>
+                      <div className="rank-info">
+                          <div className="rank-name">{p.name}</div>
+                          <div className="rank-score">{p.score} <span className="unit">SC</span></div>
+                      </div>
+                  </div>
               ))}
-          </ol>
+          </div>
           <button className="main-btn" onClick={() => router.push('/')}>タイトルに戻る</button>
       </div>
     </div>

@@ -8,8 +8,7 @@ export default function RulePage() {
   return (
     <div className="container">
       <div id="rule-screen" className="screen active">
-        <button className="back-btn" onClick={() => router.push('/')}>← タイトル</button>
-        <center><h2>ゲームの流れ</h2></center>
+        <h2>ゲームの流れ</h2>
         <div className="rule-scroll">
           <h3>【全体像】</h3>
           <ul>
@@ -37,7 +36,8 @@ export default function RulePage() {
               <li><b>ローリスク・ローリターン：</b>リターンもリスクも控えめです。</li>
           </ul>
         </div>
-        <center><button className="main-btn" onClick={() => router.push('/setup')}>設定へ進む</button></center>
+        
+        <button className="main-btn" onClick={() => router.push('/setup')}>設定へ進む</button>
       </div>
     </div>
   );

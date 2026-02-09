@@ -245,14 +245,21 @@ export default function GachaPage() {
   return (
     <div className="container">
       <div id="gacha-screen" className="screen active">
-          <h3>ROUND {gameState.curR}</h3>
           <h2>ガチャタイム</h2>
-          <p><b>{currentPresenter?.name}</b>さんの挑戦</p>
-          <p>集めた資金額: {currentPresenterInvest} SC</p>
           
-          <div style={{ margin: '15px 0', background: '#000', height: '25px', borderRadius: '15px', border: '2px solid #333', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ width: `${successRate * 100}%`, height: '100%', background: 'linear-gradient(90deg, var(--accent), var(--primary))', transition: 'width 0.5s' }}></div>
-              <div style={{ position: 'absolute', width: '100%', textAlign: 'center', lineHeight: '22px', fontWeight: 'bold', fontSize: '0.8rem', top: 0 }}>
+          <div className="info-card presenter-card">
+            <div className="card-label">挑戦者</div>
+            <div className="card-value">{currentPresenter?.name}</div>
+          </div>
+          
+          <div className="info-card balance-card">
+            <div className="card-label">集めた資金額</div>
+            <div className="card-value highlight-amount">{currentPresenterInvest} <span className="unit">SC</span></div>
+          </div>
+          
+          <div className="success-rate-bar">
+              <div className="rate-bar-fill" style={{ width: `${successRate * 100}%` }}></div>
+              <div className="rate-bar-label">
                   成功確率: {Math.round(successRate * 100)}%
               </div>
           </div>
@@ -263,47 +270,47 @@ export default function GachaPage() {
           </div>
           
           {gameState.curR === 2 && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '20px 0' }}>
-                  <div id="roulette-board" style={{ width: '350px', height: '350px', borderRadius: '50%', border: '10px solid var(--gold)', position: 'relative', background: 'radial-gradient(#fff, #f0f0f0)', overflow: 'hidden', boxShadow: '0 0 25px rgba(0,0,0,0.3)' }}>
-                      {Array.from({ length: 12 }).map((_, i) => {
-                          const isWin = i < Math.round(successRate * 12);
-                          return (
-                              <div key={i} style={{ position: 'absolute', width: '100%', height: '100%', transform: `rotate(${i * 30}deg)`, textAlign: 'center' }}>
-                                  <Image 
-                                      src={isWin ? "/image3.jpg" : "/image1.jpg"} 
-                                      alt={isWin ? "success" : "fail"}
-                                      width={60} 
-                                      height={60}
-                                      style={{ position: 'absolute', top: '20px', left: 'calc(50% - 30px)', transform: `rotate(-${i * 30}deg)` }}
-                                  />
-                              </div>
-                          );
-                      })}
-                      
-                      <div ref={needleRef} style={{ position: 'absolute', top: 0, left: 'calc(50% - 4px)', width: '8px', height: '50%', background: '#ff4d4d', transformOrigin: 'bottom', borderRadius: '10px', zIndex: 100, boxShadow: '0 0 5px rgba(0,0,0,0.2)' }}>
-                          <div style={{ width: 0, height: 0, borderLeft: '12px solid transparent', borderRight: '12px solid transparent', borderBottom: '24px solid #ff4d4d', position: 'absolute', top: '-20px', left: '-8px' }}></div>
-                      </div>
-                      
-                      <div style={{ position: 'absolute', top: '50%', left: '50%', width: '30px', height: '30px', background: 'var(--gold)', borderRadius: '50%', transform: 'translate(-50%,-50%)', zIndex: 101, border: '3px solid #fff' }}></div>
-                  </div>
-                  <div style={{ marginTop: '15px', fontWeight: 'bold', color: 'var(--gold)', fontSize: '1.2rem', minHeight: '1.5em' }}>
-                      成功マス: {Math.round(successRate * 12)} / 12
-                  </div>
-              </div>
-          )}
-          
-          {gameState.curR !== 2 && (
-              <div className="slot-container" style={{ display: 'flex', justifyContent: 'center', gap: '15px', margin: '25px 0' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '20px 0', width: '100%' }}>
+                    <div id="roulette-board" style={{ width: 'min(350px, 90vw)', height: 'min(350px, 90vw)', maxWidth: '350px', maxHeight: '350px', borderRadius: '50%', border: '10px solid var(--gold)', position: 'relative', background: 'radial-gradient(#fff, #f0f0f0)', overflow: 'hidden', boxShadow: '0 0 25px rgba(0,0,0,0.3)' }}>
+                        {Array.from({ length: 12 }).map((_, i) => {
+                            const isWin = i < Math.round(successRate * 12);
+                            return (
+                                <div key={i} style={{ position: 'absolute', width: '100%', height: '100%', transform: `rotate(${i * 30}deg)`, textAlign: 'center' }}>
+                                    <Image 
+                                        src={isWin ? "/image3.jpg" : "/image1.jpg"} 
+                                        alt={isWin ? "success" : "fail"}
+                                        width={60} 
+                                        height={60}
+                                        style={{ position: 'absolute', top: '20px', left: 'calc(50% - 30px)', transform: `rotate(-${i * 30}deg)` }}
+                                    />
+                                </div>
+                            );
+                        })}
+                        
+                        <div ref={needleRef} style={{ position: 'absolute', top: 0, left: 'calc(50% - 4px)', width: '8px', height: '50%', background: '#ff4d4d', transformOrigin: 'bottom', borderRadius: '10px', zIndex: 100, boxShadow: '0 0 5px rgba(0,0,0,0.2)' }}>
+                            <div style={{ width: 0, height: 0, borderLeft: '12px solid transparent', borderRight: '12px solid transparent', borderBottom: '24px solid #ff4d4d', position: 'absolute', top: '-20px', left: '-8px' }}></div>
+                        </div>
+                        
+                        <div style={{ position: 'absolute', top: '50%', left: '50%', width: '30px', height: '30px', background: 'var(--gold)', borderRadius: '50%', transform: 'translate(-50%,-50%)', zIndex: 101, border: '3px solid #fff' }}></div>
+                    </div>
+                    <div style={{ marginTop: '15px', fontWeight: 'bold', color: 'var(--gold)', fontSize: '1.2rem', minHeight: '1.5em' }}>
+                        成功マス: {Math.round(successRate * 12)} / 12
+                    </div>
+                </div>
+            )}
+            
+            {gameState.curR !== 2 && (
+              <div className="slot-container" style={{ display: 'flex', justifyContent: 'center', gap: '15px', margin: '25px 0', width: '100%', flexWrap: 'wrap' }}>
                   {[0, 1, 2].map((i) => (
-                      <div key={i} className="slot-reel-window" style={{ width: '140px', height: '160px', overflow: 'hidden', background: '#fff', border: '5px solid var(--gold)', borderRadius: '10px' }}>
-                          <div className="slot-char" style={{ height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div key={i} className="slot-reel-window" style={{ width: 'min(140px, 28vw)', height: 'min(160px, 32vw)', maxWidth: '140px', maxHeight: '160px', overflow: 'hidden', background: '#fff', border: '5px solid var(--gold)', borderRadius: '10px' }}>
+                          <div className="slot-char" style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               {slotResults[i] && (
                                   <Image 
                                       src={slotResults[i]!} 
                                       alt="slot"
                                       width={130} 
                                       height={130}
-                                      style={{ objectFit: 'contain' }}
+                                      style={{ objectFit: 'contain', width: '90%', height: 'auto' }}
                                   />
                               )}
                           </div>
@@ -311,18 +318,18 @@ export default function GachaPage() {
                   ))}
               </div>
           )}
-
-          {!gameState.gachaResult && <button className="main-btn" onClick={roll} disabled={isRolling}>{isRolling ? '抽選中...' : '運命の判定！'}</button>}
           
           {gameState.gachaResult && (
-              <div className="gacha-result-box">
-                  <p style={{ fontSize: '2rem', fontWeight: 'bold', color: gameState.gachaResult.isSuccess ? 'var(--primary)' : 'var(--accent)' }}>
-                      {gameState.gachaResult.isSuccess ? 'SUCCESS!!' : 'FAILURE...'}
-                  </p>
+                <div className="gacha-result-box">
+                    <p style={{ fontSize: '2rem', fontWeight: 'bold', color: gameState.gachaResult.isSuccess ? 'var(--primary)' : 'var(--accent)' }}>
+                        {gameState.gachaResult.isSuccess ? 'SUCCESS!!' : 'FAILURE...'}
+                    </p>
                   <p>{gameState.gachaResult.isSuccess ? '獲得資金' : '負債額'}: {Math.abs(gameState.gachaResult.gain)} SC</p>
-                  <button className="main-btn" onClick={nextG}>次へ進む</button>
               </div>
           )}
+          
+          {!gameState.gachaResult && <button className="main-btn" onClick={roll} disabled={isRolling}>{isRolling ? '抽選中...' : '運命の判定！'}</button>}
+          {gameState.gachaResult && <button className="main-btn" onClick={nextG}>次へ進む</button>}
       </div>
     </div>
   );

@@ -58,41 +58,31 @@ export default function InvestPage() {
       }
   };
 
-  const investBack = () => {
-      let prevInvIdx = gameState.invIdx - 1;
-      
-      // 自分自身への投資はスキップ
-      if (prevInvIdx === gameState.pIdx) {
-          prevInvIdx--;
-      }
-
-      if (prevInvIdx >= 0) {
-          setGameState({ ...gameState, invIdx: prevInvIdx });
-      } else {
-          // 前のプレゼンターへ戻る
-          let prevPIdx = gameState.pIdx - 1;
-          
-          if (prevPIdx >= 0) {
-              const lastInvIdx = gameState.players.length - 1 === prevPIdx 
-                  ? gameState.players.length - 2 
-                  : gameState.players.length - 1;
-              setGameState({ ...gameState, pIdx: prevPIdx, invIdx: lastInvIdx });
-          } else {
-              router.push('/game/pitch');
-          }
-      }
-  };
-
   return (
     <div className="container">
       <div id="invest-screen" className="screen active">
-          <button className="back-btn" onClick={investBack}>← 戻る</button>
-          <h3>ROUND {gameState.curR}</h3>
           <h2>投資タイム</h2>
-          <p><b>{currentPresenter?.name}</b>さんのプレゼン</p>
-          <p>投資家：<b>{currentInvestor?.name}</b>さん</p>
-          <p>あなたの所持金: {currentInvestor?.sc} SC</p>
-          <p>投資額を決めてください (上限: {Math.min(gameState.curR * 3, currentInvestor?.sc || 0)} SC)</p>
+          
+          <div className="info-card presenter-card">
+            <div className="card-label">プレゼンター</div>
+            <div className="card-value">{currentPresenter?.name}</div>
+          </div>
+          
+          <div className="info-card investor-card">
+            <div className="card-label">投資家</div>
+            <div className="card-value">{currentInvestor?.name}</div>
+          </div>
+          
+          <div className="info-card balance-card">
+            <div className="card-label">あなたの所持金</div>
+            <div className="card-value highlight-amount">{currentInvestor?.sc} <span className="unit">SC</span></div>
+          </div>
+          
+          <div className="instruction-box">
+            <p>投資額を決めてください</p>
+            <p className="limit-text">上限: {Math.min(gameState.curR * 3, currentInvestor?.sc || 0)} SC</p>
+          </div>
+          
           <input 
               type="number" 
               value={investAmount}
@@ -101,6 +91,7 @@ export default function InvestPage() {
               max={Math.min(gameState.curR * 3, currentInvestor?.sc || 0)} 
               className="invest-input" 
           />
+          
           <div className="btn-group">
               <button className="main-btn" onClick={saveInv}>投資決定</button>
               <button className="main-btn accent-btn" onClick={skipI}>スキップ</button>

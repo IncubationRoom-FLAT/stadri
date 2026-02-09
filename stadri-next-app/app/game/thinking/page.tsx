@@ -49,16 +49,19 @@ export default function ThinkingPage() {
   return (
     <div className="container">
       <div id="thinking-screen" className="screen active">
-        <h2 style={{textAlign:'center', color:'var(--gold)', marginTop:'20px'}}>💡 Thinking Time</h2>
-        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px', margin: '20px 0', width: '100%'}}>
-            <button className="main-btn" style={{minWidth: '60px'}} onClick={() => adjustTime(-30)}>-30s</button>
+        <h2 className="thinking-title">💡 Thinking Time</h2>
+        
+        <div className="timer-controls">
+            <button className="timer-adjust-btn" onClick={() => adjustTime(-30)}>-30s</button>
             <div id="think-timer" className="timer-display">{formatTime(timeLeft)}</div>
-            <button className="main-btn" style={{minWidth: '60px'}} onClick={() => adjustTime(30)}>+30s</button>
+            <button className="timer-adjust-btn" onClick={() => adjustTime(30)}>+30s</button>
         </div>
-        <center>
-            <button id="timer-toggle-btn" className="main-btn" onClick={toggleTimer}>{timerActive ? 'ストップ' : 'スタート'}</button>
-        </center>
-        <button className="next-btn accent-btn" style={{maxWidth:'none'}} onClick={showPitch}>プレゼンを開始する</button>
+        
+        <button id="timer-toggle-btn" className="main-btn timer-toggle" onClick={toggleTimer}>
+          {timerActive ? 'ストップ' : 'スタート'}
+        </button>
+        
+        <button className="next-btn accent-btn" onClick={showPitch}>プレゼンを開始する</button>
       </div>
     </div>
   );

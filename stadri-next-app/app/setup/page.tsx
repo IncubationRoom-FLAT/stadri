@@ -55,24 +55,33 @@ export default function SetupPage() {
   return (
     <div className="container">
       <div id="setup-screen" className="screen active">
-          <h2>ゲーム設定</h2>
+        <h2>ゲーム設定</h2>
+        
+        <div className="setup-section">
           <h3>参加人数</h3>
-          <select id="num-players" value={numPlayers} onChange={handleNumPlayersChange}>
+          <select id="num-players" className="setup-select" value={numPlayers} onChange={handleNumPlayersChange}>
               {[...Array(4)].map((_, i) => <option key={i} value={i + 2}>{i + 2}人</option>)}
           </select>
+        </div>
+        
+        <div className="setup-section">
+          <h3>プレイヤー名</h3>
           <div id="name-area">
               {[...Array(numPlayers)].map((_, i) => (
-                <div key={i} style={{ marginBottom: '8px' }}>
+                <div key={i} className="name-input-wrapper">
                   <input 
                     type="text" 
                     value={playerNames[i]}
                     onChange={(e) => handlePlayerNameChange(i, e.target.value)}
-                    placeholder={`プレイヤー ${i + 1} の名前`} 
+                    placeholder={`プレイヤー ${i + 1} の名前`}
+                    className="name-input"
                   />
                 </div>
               ))}
           </div>
-          <button className="main-btn" onClick={initGame}>この内容で始める</button>
+        </div>
+        
+        <button className="main-btn" onClick={initGame}>この内容で始める</button>
       </div>
     </div>
   );
