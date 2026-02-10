@@ -126,7 +126,7 @@ export default function GachaPage() {
               let spinCount = 0;
               const spinInterval = setInterval(() => {
                   const randomSymbol = Math.random() < rate ? URL_SUCCESS : URL_FAIL;
-                  setSlotResults((prev: (string | null)[]) => {
+                  setSlotResults(prev => {
                       const newResults = [...prev];
                       newResults[i] = randomSymbol;
                       return newResults;
@@ -134,7 +134,7 @@ export default function GachaPage() {
                   spinCount++;
                   if (spinCount > 10) {
                       clearInterval(spinInterval);
-                      setSlotResults((prev: (string | null)[]) => {
+                      setSlotResults(prev => {
                           const newResults = [...prev];
                           newResults[i] = targetSymbol;
                           return newResults;
