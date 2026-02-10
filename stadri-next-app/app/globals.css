@@ -1,12 +1,12 @@
 :root { 
     --bg: #0a0b1e; --card: #161b33; --primary: #00f2ff; 
     --accent: #ff007a; --text: #ffffff; --gold: #ffd700; 
+    --max-content-width: 600px; /* スマホサイズ基準 */
 }
 
 body { 
     font-family: sans-serif;
-    background: linear-gradient(135deg, var(--bg) 0%, #0d0f2e 50%, var(--bg) 100%);
-    background-attachment: fixed;
+    background: #ffffff; /* PC表示時の左右余白は白色 */
     color: var(--text); 
     margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; 
     display: flex; 
@@ -16,13 +16,58 @@ body {
     overflow-x: hidden;
 }
 
-/* 背景の装飾エフェクト */
-body::before {
+/* メインコンテンツラッパー */
+#app-wrapper {
+    width: 100%;
+    max-width: var(--max-content-width);
+    margin: 0 auto;
+    background: linear-gradient(135deg, var(--bg) 0%, #0d0f2e 50%, var(--bg) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* PC表示時の左右ロゴ（768px以上） */
+@media screen and (min-width: 768px) {
+    body::before,
+    body::after {
+        content: '';
+        position: fixed;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 250px;
+        max-width: calc((100vw - var(--max-content-width)) / 2 - 40px);
+        height: auto;
+        aspect-ratio: 1;
+        background-image: url('/flat-logo.jpg');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        z-index: 1;
+        opacity: 0.9;
+    }
+    
+    body::before {
+        left: calc((100vw - var(--max-content-width)) / 4);
+    }
+    
+    body::after {
+        right: calc((100vw - var(--max-content-width)) / 4);
+        transform: translate(50%, -50%);
+    }
+}
+
+/* 背景の装飾エフェクト（メインコンテンツエリアのみ） */
+#app-wrapper::before {
     content: '';
     position: fixed;
     top: -50%;
-    left: -50%;
+    left: 50%;
+    transform: translateX(-50%);
     width: 200%;
+    max-width: calc(var(--max-content-width) * 2);
     height: 200%;
     background: radial-gradient(circle at 20% 50%, rgba(0, 242, 255, 0.03) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(255, 0, 122, 0.03) 0%, transparent 50%);
@@ -50,10 +95,11 @@ body::before {
     position: sticky;
     top: 0;
     z-index: 100;
+    box-sizing: border-box;
 }
 
 .header-content {
-    max-width: 1200px;
+    width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -113,7 +159,6 @@ body::before {
 
 .progress-container {
     width: 100%;
-    max-width: 600px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -208,6 +253,7 @@ body::before {
     padding: 20px;
     box-shadow: 0 -2px 20px rgba(0, 242, 255, 0.3);
     margin-top: auto;
+    box-sizing: border-box;
 }
 
 .copyright {
