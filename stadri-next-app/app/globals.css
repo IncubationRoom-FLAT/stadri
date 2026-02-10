@@ -45,7 +45,7 @@ body {
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-        z-index: 1;
+        z-index: -1;
         opacity: 0.9;
     }
     
@@ -703,6 +703,9 @@ ul { display: inline-block; text-align: left; }
 .highlight-amount {
     color: var(--gold);
     text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .unit {
@@ -981,6 +984,9 @@ ul { display: inline-block; text-align: left; }
     font-weight: 900;
     color: var(--gold);
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* --- 残りの既存スタイル --- */
@@ -1032,6 +1038,159 @@ ul { display: inline-block; text-align: left; }
     box-sizing: border-box;
 }
 
+/* 結果POPUPスタイル */
+.result-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.result-popup {
+    background: transparent;
+    border-radius: 20px;
+    padding: 20px;
+    max-width: 90%;
+    width: 450px;
+    animation: popupSlideIn 0.4s ease;
+}
+
+@keyframes popupSlideIn {
+    from {
+        transform: translateY(-50px) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.result-popup-content {
+    background: linear-gradient(135deg, rgba(22, 27, 51, 0.98) 0%, rgba(10, 11, 30, 0.98) 100%);
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    border: 3px solid;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.result-popup-content.success {
+    border-color: var(--primary);
+    box-shadow: 0 10px 40px rgba(0, 242, 255, 0.4), 0 0 60px rgba(0, 242, 255, 0.2);
+}
+
+.result-popup-content.failure {
+    border-color: var(--accent);
+    box-shadow: 0 10px 40px rgba(255, 0, 122, 0.4), 0 0 60px rgba(255, 0, 122, 0.2);
+}
+
+.result-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin: 0 0 20px 0;
+    text-shadow: 0 0 20px currentColor;
+    animation: pulseglow 2s ease-in-out infinite;
+}
+
+.result-popup-content.success .result-title {
+    color: var(--primary);
+}
+
+.result-popup-content.failure .result-title {
+    color: var(--accent);
+}
+
+@keyframes pulseglow {
+    0%, 100% { 
+        text-shadow: 0 0 20px currentColor;
+        transform: scale(1);
+    }
+    50% { 
+        text-shadow: 0 0 30px currentColor, 0 0 50px currentColor;
+        transform: scale(1.05);
+    }
+}
+
+.result-amount {
+    font-size: 1.3rem;
+    color: var(--text);
+    margin: 20px 0 30px 0;
+}
+
+.amount-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-top: 10px;
+    color: var(--gold);
+    text-shadow: 0 0 15px var(--gold);
+}
+
+.popup-close-btn {
+    background: linear-gradient(135deg, var(--primary) 0%, #00d9ff 100%);
+    color: #000;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 242, 255, 0.4);
+}
+
+.popup-close-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(0, 242, 255, 0.6);
+}
+
+.popup-close-btn:active {
+    transform: translateY(0);
+}
+
+/* ロケットアニメーション表示エリア */
+.rocket-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    min-height: 400px;
+    background: transparent;
+}
+
+.rocket-container img {
+    animation: rocketAppear 0.3s ease;
+    background: transparent;
+}
+
+@keyframes rocketAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 .success-text {
     color: var(--primary);
     font-weight: bold;
@@ -1080,6 +1239,62 @@ ul { display: inline-block; text-align: left; }
     font-size: 2rem !important;
     padding: 20px !important;
     margin: 20px 0 !important;
+}
+
+/* コイン画像アイコン */
+.coin-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+
+.coin-icon-inline {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 5px;
+}
+
+/* 投資額入力コントロール */
+.input-with-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+    width: 100%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.control-btn {
+    background: linear-gradient(135deg, var(--primary) 0%, #00d9ff 100%);
+    color: #000;
+    border: none;
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+    font-weight: bold;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 242, 255, 0.4);
+    flex-shrink: 0;
+}
+
+.control-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(0, 242, 255, 0.6);
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+}
+
+.input-with-controls .invest-input {
+    flex: 1;
+    text-align: center;
+    margin: 0 !important;
 }
 
 .odai-display {
