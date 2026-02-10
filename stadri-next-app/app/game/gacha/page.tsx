@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useGame } from '@/app/context/GameContext';
@@ -25,6 +25,8 @@ export default function GachaPage() {
   } = useGame();
   
   const needleRef = useRef<HTMLDivElement>(null);
+  const [rocketImage, setRocketImage] = useState<string | null>(null);
+  const [showResultPopup, setShowResultPopup] = useState(false);
   
   const currentPresenter = gameState.players[gameState.pIdx];
   const currentPresenterInvest = gameState.invests[gameState.pIdx] || 0;
@@ -54,16 +56,27 @@ export default function GachaPage() {
       if (isRolling) return;
       setIsRolling(true);
       setRouletteResult(null);
+      setShowResultPopup(false);
 
       const totalInvest = gameState.invests[gameState.pIdx] || 0;
       const mode = gameState.modes[gameState.pIdx];
       
       const rate = GACHA_RATES[mode as keyof typeof GACHA_RATES];
-      const isSuccess = Math.random() < rate.success;
+      const randomValue = Math.random();
+      const isSuccess = randomValue < rate.success;
+      
+      console.log('=== Gacha Roll ===');
+      console.log('Round:', gameState.curR);
+      console.log('Mode:', mode);
+      console.log('Success Rate:', rate.success);
+      console.log('Random Value:', randomValue);
+      console.log('Is Success:', isSuccess);
       
       // ラウンドに応じた演出
       if (gameState.curR === 2) {
           performRouletteAnimation(isSuccess);
+      } else if (gameState.curR === 3) {
+          performRocketAnimation(isSuccess);
       } else {
           performSlotAnimation(isSuccess);
       }
@@ -150,13 +163,50 @@ export default function GachaPage() {
       }, 1000);
   };
 
+  const performRocketAnimation = async (isSuccess: boolean) => {
+      console.log('Rocket Animation - isSuccess:', isSuccess);
+      
+      // 共通フレーム1
+      setRocketImage('/success_rocket1.png');
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // 共通フレーム2
+      setRocketImage('/success_rocket2.png');
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // 少し間を開ける
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // 結果に応じたフレーム3
+      const frame3 = isSuccess ? '/success_rocket3.png' : '/fail_rocket3.png';
+      console.log('Frame 3:', frame3);
+      setRocketImage(frame3);
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // 結果に応じたフレーム4
+      const frame4 = isSuccess ? '/success_rocket4.png' : '/fail_rocket4.png';
+      console.log('Frame 4:', frame4);
+      setRocketImage(frame4);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // アニメーション完了後に結果を確定
+      console.log('Finalizing with isSuccess:', isSuccess);
+      finalizeGachaResult(isSuccess);
+  };
+
   const finalizeGachaResult = (isSuccess: boolean) => {
+      console.log('=== Finalize Gacha Result ===');
+      console.log('isSuccess:', isSuccess);
+      
       const totalInvest = gameState.invests[gameState.pIdx] || 0;
       const mode = gameState.modes[gameState.pIdx];
       const resultKey = isSuccess ? 'success' : 'fail';
       const multipliers = GACHA_RESULTS[mode as keyof typeof GACHA_RESULTS][resultKey as keyof typeof GACHA_RESULTS.Low];
       const multiplier = multipliers[Math.floor(Math.random() * multipliers.length)];
       const gain = Math.round(totalInvest * multiplier);
+
+      console.log('Result Key:', resultKey);
+      console.log('Gain:', gain);
 
       const logEntry = {
           round: gameState.curR,
@@ -195,6 +245,9 @@ export default function GachaPage() {
           invLog: [...gameState.invLog, logEntry],
           gachaResult: { isSuccess, gain }
       });
+      
+      // POPUP表示
+      setShowResultPopup(true);
   };
 
   const nextG = () => {
@@ -210,6 +263,8 @@ export default function GachaPage() {
           setIsRolling(false);
           setRouletteResult(null);
           setSlotResults([null, null, null]);
+          setRocketImage(null);
+          setShowResultPopup(false);
       } else {
           if (gameState.curR < 3) {
               let globalOdaiPool: any[] = [];
@@ -230,6 +285,8 @@ export default function GachaPage() {
                   gachaResult: null
               });
               setOdaiRevealed(false);
+              setRocketImage(null);
+              setShowResultPopup(false);
               router.push('/game/confirm');
           } else {
               const finalScores = gameState.players.map(p => ({
@@ -254,7 +311,7 @@ export default function GachaPage() {
           
           <div className="info-card balance-card">
             <div className="card-label">集めた資金額</div>
-            <div className="card-value highlight-amount">{currentPresenterInvest} <span className="unit">SC</span></div>
+            <div className="card-value highlight-amount">{currentPresenterInvest} <Image src="/coin.png" alt="coin" width={24} height={24} className="coin-icon" /></div>
           </div>
           
           <div className="success-rate-bar">
@@ -299,7 +356,7 @@ export default function GachaPage() {
                 </div>
             )}
             
-            {gameState.curR !== 2 && (
+            {gameState.curR !== 2 && gameState.curR !== 3 && (
               <div className="slot-container" style={{ display: 'flex', justifyContent: 'center', gap: '15px', margin: '25px 0', width: '100%', flexWrap: 'wrap' }}>
                   {[0, 1, 2].map((i) => (
                       <div key={i} className="slot-reel-window" style={{ width: 'min(140px, 28vw)', height: 'min(160px, 32vw)', maxWidth: '140px', maxHeight: '160px', overflow: 'hidden', background: '#fff', border: '5px solid var(--gold)', borderRadius: '10px' }}>
@@ -319,17 +376,43 @@ export default function GachaPage() {
               </div>
           )}
           
-          {gameState.gachaResult && (
-                <div className="gacha-result-box">
-                    <p style={{ fontSize: '2rem', fontWeight: 'bold', color: gameState.gachaResult.isSuccess ? 'var(--primary)' : 'var(--accent)' }}>
-                        {gameState.gachaResult.isSuccess ? 'SUCCESS!!' : 'FAILURE...'}
-                    </p>
-                  <p>{gameState.gachaResult.isSuccess ? '獲得資金' : '負債額'}: {Math.abs(gameState.gachaResult.gain)} SC</p>
+          {gameState.curR === 3 && (
+              <div className="rocket-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end', margin: '40px 0', width: '100%', minHeight: '400px', background: 'transparent' }}>
+                  {rocketImage && (
+                      <Image 
+                          src={rocketImage} 
+                          alt="rocket animation"
+                          width={300} 
+                          height={400}
+                          style={{ objectFit: 'contain', width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '400px', background: 'transparent' }}
+                          priority
+                      />
+                  )}
               </div>
           )}
           
           {!gameState.gachaResult && <button className="main-btn" onClick={roll} disabled={isRolling}>{isRolling ? '抽選中...' : '運命の判定！'}</button>}
           {gameState.gachaResult && <button className="main-btn" onClick={nextG}>次へ進む</button>}
+          
+          {/* 結果POPUP */}
+          {showResultPopup && gameState.gachaResult && (
+              <div className="result-popup-overlay" onClick={() => setShowResultPopup(false)}>
+                  <div className="result-popup" onClick={(e) => e.stopPropagation()}>
+                      <div className={`result-popup-content ${gameState.gachaResult.isSuccess ? 'success' : 'failure'}`}>
+                          <h2 className="result-title">
+                              {gameState.gachaResult.isSuccess ? 'SUCCESS!!' : 'FAILURE...'}
+                          </h2>
+                          <p className="result-amount">
+                              {gameState.gachaResult.isSuccess ? '獲得資金' : '負債額'}: 
+                              <span className="amount-value">{Math.abs(gameState.gachaResult.gain)} <Image src="/coin.png" alt="coin" width={28} height={28} className="coin-icon" /></span>
+                          </p>
+                          <button className="popup-close-btn" onClick={() => setShowResultPopup(false)}>
+                              閉じる
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          )}
       </div>
     </div>
   );

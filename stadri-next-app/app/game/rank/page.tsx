@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useGame } from '@/app/context/GameContext';
 
 export default function RankPage() {
@@ -17,7 +18,7 @@ export default function RankPage() {
                       <div className="rank-position">{i + 1}</div>
                       <div className="rank-info">
                           <div className="rank-name">{p.name}</div>
-                          <div className="rank-score">{p.score} <span className="unit">SC</span></div>
+                          <div className="rank-score">{p.score} <Image src="/coin.png" alt="coin" width={24} height={24} className="coin-icon" /></div>
                       </div>
                   </div>
               ))}
