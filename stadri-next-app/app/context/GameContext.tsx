@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, Dispatch, SetStateAction } from 'react';
 
 const ODAIS = {
     "ファミリー": [
@@ -149,7 +149,7 @@ interface GameContextType {
     rouletteResult: string | null;
     setRouletteResult: (result: string | null) => void;
     slotResults: (string | null)[];
-    setSlotResults: (results: (string | null)[]) => void;
+    setSlotResults: Dispatch<SetStateAction<(string | null)[]>>;
     successRate: number;
     setSuccessRate: (rate: number) => void;
     ODAIS: typeof ODAIS;
