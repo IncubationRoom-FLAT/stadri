@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useGame } from '@/app/context/GameContext';
 
 export default function InvestPage() {
@@ -58,6 +59,15 @@ export default function InvestPage() {
       }
   };
 
+  const incrementAmount = () => {
+      const max = Math.min(gameState.curR * 3, currentInvestor?.sc || 0);
+      setInvestAmount(prev => Math.min(prev + 1, max));
+  };
+
+  const decrementAmount = () => {
+      setInvestAmount(prev => Math.max(prev - 1, 0));
+  };
+
   return (
     <div className="container">
       <div id="invest-screen" className="screen active">
@@ -75,22 +85,26 @@ export default function InvestPage() {
           
           <div className="info-card balance-card">
             <div className="card-label">あなたの所持金</div>
-            <div className="card-value highlight-amount">{currentInvestor?.sc} <span className="unit">SC</span></div>
+            <div className="card-value highlight-amount">{currentInvestor?.sc} <Image src="/coin.png" alt="coin" width={24} height={24} className="coin-icon" /></div>
           </div>
           
           <div className="instruction-box">
             <p>投資額を決めてください</p>
-            <p className="limit-text">上限: {Math.min(gameState.curR * 3, currentInvestor?.sc || 0)} SC</p>
+            <p className="limit-text">上限: {Math.min(gameState.curR * 3, currentInvestor?.sc || 0)} <Image src="/coin.png" alt="coin" width={20} height={20} className="coin-icon-inline" /></p>
           </div>
           
-          <input 
-              type="number" 
-              value={investAmount}
-              onChange={(e) => setInvestAmount(parseInt(e.target.value) || 0)}
-              min="0" 
-              max={Math.min(gameState.curR * 3, currentInvestor?.sc || 0)} 
-              className="invest-input" 
-          />
+          <div className="input-with-controls">
+              <button className="control-btn" onClick={decrementAmount}>-</button>
+              <input 
+                  type="number" 
+                  value={investAmount}
+                  onChange={(e) => setInvestAmount(parseInt(e.target.value) || 0)}
+                  min="0" 
+                  max={Math.min(gameState.curR * 3, currentInvestor?.sc || 0)} 
+                  className="invest-input" 
+              />
+              <button className="control-btn" onClick={incrementAmount}>+</button>
+          </div>
           
           <div className="btn-group">
               <button className="main-btn" onClick={saveInv}>投資決定</button>
