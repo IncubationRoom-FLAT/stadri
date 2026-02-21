@@ -2,13 +2,15 @@
 
 import { useRouter } from 'next/navigation';
 import { useGame } from '@/app/context/GameContext';
+import PlayerAvatar from '@/app/components/PlayerAvatar';
 
 export default function ConfirmPage() {
   const router = useRouter();
   const { gameState, setGameState, odaiRevealed, setOdaiRevealed } = useGame();
   
-  const currentPlayer = gameState.players[gameState.pIdx];
-  const currentOdai = gameState.playerOdai[gameState.pIdx];
+  const currentPlayerIdx = gameState.pIdx;
+  const currentPlayer = gameState.players[currentPlayerIdx];
+  const currentOdai = gameState.playerOdai[currentPlayerIdx];
 
   const nextConfirm = () => {
     if (gameState.pIdx < gameState.players.length - 1) {
@@ -23,9 +25,19 @@ export default function ConfirmPage() {
     <div className="container">
       <div id="confirm-all-screen" className="screen active">
         <h2>お題の確認</h2>
-        
-        <div className="info-card player-card">
-          <div className="card-value">{currentPlayer?.name} <span className="card-label-inline">さん</span></div>
+
+        {/* 全プレイヤーの進行アバター */}
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '20px' }}>
+          {gameState.players.map((p, i) => (
+            <PlayerAvatar
+              key={i}
+              name={p.name}
+              turnOrder={i}
+              size={i === currentPlayerIdx ? 72 : 48}
+              isMe={i === currentPlayerIdx}
+              status={i < currentPlayerIdx ? 'done' : i === currentPlayerIdx ? 'current' : 'pending'}
+            />
+          ))}
         </div>
         
         <p className="instruction-text">あなたのお題はこちらです</p>

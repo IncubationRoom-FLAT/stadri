@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useGame } from '@/app/context/GameContext';
+import PlayerAvatar from '@/app/components/PlayerAvatar';
 
 export default function GachaPage() {
   const router = useRouter();
@@ -304,9 +305,13 @@ export default function GachaPage() {
       <div id="gacha-screen" className="screen active">
           <h2>ガチャタイム</h2>
           
-          <div className="info-card presenter-card">
-            <div className="card-label">挑戦者</div>
-            <div className="card-value">{currentPresenter?.name}</div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+            <PlayerAvatar
+              name={currentPresenter?.name ?? ''}
+              turnOrder={gameState.pIdx}
+              size={64}
+              status="current"
+            />
           </div>
           
           <div className="info-card balance-card">

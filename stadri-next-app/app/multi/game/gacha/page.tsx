@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useMultiRoom } from '@/app/context/MultiRoomContext';
+import PlayerAvatar from '@/app/components/PlayerAvatar';
 
 export default function MultiGachaPage() {
     const { myPlayer, roomState, submitGacha, error } = useMultiRoom();
@@ -67,12 +68,18 @@ export default function MultiGachaPage() {
                         </div>
                     )}
                     <div className="info-card" style={{ marginTop: '16px' }}>
-                        <div className="card-label">待機中</div>
-                        {waitingPlayers.map(p => (
-                            <p key={p.id} style={{ margin: '4px 0', color: 'var(--text-muted, #aaa)' }}>
-                                ⏳ {p.name} さんのガチャを待っています
-                            </p>
-                        ))}
+                        <div className="card-label" style={{ marginBottom: '12px' }}>ガチャ待ち</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', justifyContent: 'center' }}>
+                            {waitingPlayers.map(p => (
+                                <PlayerAvatar
+                                    key={p.id}
+                                    name={p.name}
+                                    turnOrder={p.turnOrder}
+                                    size={52}
+                                    badge="⏳"
+                                />
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -191,9 +198,14 @@ export default function MultiGachaPage() {
             <div className="screen active">
                 <h2>ガチャタイム</h2>
 
-                <div className="info-card presenter-card">
-                    <div className="card-label">挑戦者</div>
-                    <div className="card-value">{myPlayer.name} (あなた)</div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+                    <PlayerAvatar
+                        name={myPlayer.name}
+                        turnOrder={myPlayer.turnOrder}
+                        size={64}
+                        isMe
+                        status="current"
+                    />
                 </div>
 
                 <div className="info-card balance-card">

@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useMultiRoom } from '@/app/context/MultiRoomContext';
+import PlayerAvatar from '@/app/components/PlayerAvatar';
 
 export default function MultiRankPage() {
     const { myPlayer, roomState, restartGame, endGame, error } = useMultiRoom();
@@ -22,24 +23,31 @@ export default function MultiRankPage() {
                 <h2>🏆 最終結果</h2>
 
                 <div className="ranking-container">
-                    {roomState.finalRanking?.map((p, i) => (
-                        <div
-                            key={i}
-                            className={`rank-card rank-${i + 1}`}
-                            style={{
-                                border:
-                                    p.name === myPlayer?.name
-                                        ? '2px solid var(--gold, #f0c040)'
-                                        : undefined,
-                            }}
-                        >
-                            <div className="rank-position">{i + 1}</div>
-                            <div className="rank-info">
-                                <div className="rank-name">
-                                    {p.name}
-                                    {p.name === myPlayer?.name && ' (あなた)'}
-                                </div>
-                                <div className="rank-score">
+                    {roomState.finalRanking?.map((p, i) => {
+                        const player = roomState.players.find(pl => pl.name === p.name);
+                        const turnOrder = player?.turnOrder ?? i;
+                        return (
+                            <div
+                                key={i}
+                                className={`rank-card rank-${i + 1}`}
+                                style={{
+                                    border:
+                                        p.name === myPlayer?.name
+                                            ? '2px solid var(--gold, #f0c040)'
+                                            : undefined,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                }}
+                            >
+                                <div className="rank-position">{i + 1}</div>
+                                <PlayerAvatar
+                                    name={p.name}
+                                    turnOrder={turnOrder}
+                                    size={48}
+                                    isMe={p.name === myPlayer?.name}
+                                />
+                                <div className="rank-score" style={{ marginLeft: 'auto' }}>
                                     {p.score}{' '}
                                     <Image
                                         src="/coin.png"
@@ -50,8 +58,8 @@ export default function MultiRankPage() {
                                     />
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {error && <p style={{ color: '#ff6b6b', marginBottom: '8px' }}>{error}</p>}

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMultiRoom } from '@/app/context/MultiRoomContext';
+import PlayerAvatar from '@/app/components/PlayerAvatar';
 
 function formatTime(sec: number): string {
     const m = Math.floor(sec / 60);
@@ -64,44 +65,21 @@ export default function LobbyPage() {
                     <div
                         style={{
                             display: 'flex',
-                            flexDirection: 'column',
-                            gap: '10px',
-                            marginTop: '10px',
+                            flexWrap: 'wrap',
+                            gap: '16px',
+                            justifyContent: 'center',
+                            marginTop: '14px',
                         }}
                     >
                         {roomState.players.map(p => (
-                            <div
+                            <PlayerAvatar
                                 key={p.id}
-                                className="info-card player-card"
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    padding: '12px 16px',
-                                    border:
-                                        p.id === myPlayer?.id
-                                            ? '2px solid var(--gold, #f0c040)'
-                                            : undefined,
-                                }}
-                            >
-                                <span style={{ fontWeight: 'bold' }}>
-                                    {p.name}
-                                    {p.id === myPlayer?.id && ' (あなた)'}
-                                </span>
-                                {p.isOwner && (
-                                    <span
-                                        style={{
-                                            fontSize: '0.75rem',
-                                            background: 'var(--gold, #f0c040)',
-                                            color: '#000',
-                                            padding: '2px 8px',
-                                            borderRadius: '10px',
-                                        }}
-                                    >
-                                        オーナー
-                                    </span>
-                                )}
-                            </div>
+                                name={p.name + (p.isOwner ? '\n(オーナー)' : '')}
+                                turnOrder={p.turnOrder}
+                                size={60}
+                                isMe={p.id === myPlayer?.id}
+                                badge={p.isOwner ? 'HOST' : undefined}
+                            />
                         ))}
                     </div>
                 </div>
