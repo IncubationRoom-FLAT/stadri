@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useMultiRoom } from '@/app/context/MultiRoomContext';
+import PlayerAvatar from '@/app/components/PlayerAvatar';
 
 export default function MultiInvestPage() {
     const { myPlayer, roomState, submitInvest, advancePhase, displayTimeLeft, error } =
@@ -52,17 +53,23 @@ export default function MultiInvestPage() {
             <div className="container">
                 <div className="screen active">
                     <h2>投資タイム</h2>
-                    <p style={{ color: '#6bcb77', fontWeight: 'bold', textAlign: 'center' }}>
+                    <p style={{ color: '#6bcb77', fontWeight: 'bold', textAlign: 'center', marginBottom: '16px' }}>
                         ✓ 投資を送信しました
                     </p>
-                    <div className="info-card" style={{ marginTop: '16px' }}>
-                        <div className="card-label">待機中</div>
-                        {waitingPlayers.map(p => (
-                            <p key={p.id} style={{ margin: '4px 0', color: 'var(--text-muted, #aaa)' }}>
-                                ⏳ {p.name} さんの投資を待っています
-                            </p>
-                        ))}
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted, #aaa)', marginTop: '8px' }}>
+                    <div className="info-card" style={{ marginTop: '8px' }}>
+                        <div className="card-label" style={{ marginBottom: '12px' }}>投資待ち</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center' }}>
+                            {waitingPlayers.map(p => (
+                                <PlayerAvatar
+                                    key={p.id}
+                                    name={p.name}
+                                    turnOrder={p.turnOrder}
+                                    size={52}
+                                    badge="⏳"
+                                />
+                            ))}
+                        </div>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted, #aaa)', marginTop: '12px', textAlign: 'center' }}>
                             残り {displayTimeLeft}秒 で自動的に次へ進みます
                         </p>
                     </div>
@@ -75,6 +82,25 @@ export default function MultiInvestPage() {
         <div className="container">
             <div className="screen active">
                 <h2>投資タイム</h2>
+
+                {/* 自分 → 相手 アバター一覧（投資タイム直下） */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                    <PlayerAvatar
+                        name={myPlayer.name}
+                        turnOrder={myPlayer.turnOrder}
+                        size={78}
+                        isMe
+                    />
+                    <span style={{ fontSize: '1.2rem', color: 'var(--gold, #f0c040)' }}>→</span>
+                    {roomState.players.filter((_, idx) => idx !== myPlayer.turnOrder).map(p => (
+                        <PlayerAvatar
+                            key={p.id}
+                            name={p.name}
+                            turnOrder={p.turnOrder}
+                            size={52}
+                        />
+                    ))}
+                </div>
 
                 <div
                     className="info-card"
@@ -102,26 +128,20 @@ export default function MultiInvestPage() {
                 </div>
 
                 <p className="instruction-text">
-                    各プレイヤーへの投資額を決めてください（1人上限: {maxPerInvest}）
+                    1人あたりの上限: {maxPerInvest}
                 </p>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '16px' }}>
                     {roomState.players.map((p, idx) => {
                         if (idx === myPlayer.turnOrder) return null; // skip self
                         return (
                             <div
                                 key={p.id}
                                 className="info-card"
-                                style={{ padding: '12px' }}
+                                style={{ padding: '14px 12px' }}
                             >
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <span style={{ fontWeight: 'bold' }}>{p.name}</span>
+                                {/* 投資額入力 */}
+                                <div style={{ display: 'flex', justifyContent: 'center' }}>
                                     <div className="input-with-controls">
                                         <button
                                             className="control-btn"
@@ -138,7 +158,7 @@ export default function MultiInvestPage() {
                                             min="0"
                                             max={maxPerInvest}
                                             className="invest-input"
-                                            style={{ width: '60px' }}
+                                            style={{ width: '56px' }}
                                         />
                                         <button
                                             className="control-btn"
@@ -188,14 +208,6 @@ export default function MultiInvestPage() {
                     disabled={!canSubmit}
                 >
                     投資を確定
-                </button>
-                <button
-                    className="main-btn accent-btn"
-                    onClick={() =>
-                        submitInvest(new Array(roomState.players.length).fill(0))
-                    }
-                >
-                    スキップ（投資しない）
                 </button>
             </div>
         </div>

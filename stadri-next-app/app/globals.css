@@ -138,6 +138,104 @@ body {
     transform: translateX(-2px);
 }
 
+.header-end-btn {
+    position: absolute;
+    right: 0;
+    background: rgba(255, 80, 80, 0.15);
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 1px solid rgba(255, 80, 80, 0.4);
+    color: #ff7070;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-end-btn:hover {
+    background: rgba(255, 80, 80, 0.3);
+    border-color: rgba(255, 80, 80, 0.8);
+}
+
+.end-game-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.end-game-dialog {
+    background: var(--bg-card, #1a1a2e);
+    border: 1px solid rgba(255, 80, 80, 0.4);
+    border-radius: 16px;
+    padding: 28px 24px;
+    max-width: 320px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(255, 80, 80, 0.2);
+}
+
+.end-game-dialog h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #ff7070;
+}
+
+.end-game-dialog p {
+    font-size: 0.9rem;
+    color: var(--text-muted, #aaa);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.end-game-dialog-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.end-game-cancel-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+    color: var(--text, #fff);
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+}
+
+.end-game-cancel-btn:hover {
+    background: rgba(255,255,255,0.12);
+}
+
+.end-game-confirm-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255, 80, 80, 0.8);
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.end-game-confirm-btn:hover {
+    background: rgba(255, 80, 80, 1);
+}
+
 .header-title {
     font-size: 1.8rem;
     font-weight: 900;

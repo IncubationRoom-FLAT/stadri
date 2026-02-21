@@ -1,6 +1,8 @@
 'use client';
 
 import { useMultiRoom } from '@/app/context/MultiRoomContext';
+import PlayerAvatar from '@/app/components/PlayerAvatar';
+import type { AvatarStatus } from '@/app/components/PlayerAvatar';
 
 function formatTime(seconds: number) {
     const m = Math.floor(seconds / 60);
@@ -32,51 +34,34 @@ export default function MultiPitchPage() {
             <div className="screen active">
                 <h2>プレゼンタイム</h2>
 
-                {/* Progress indicators */}
+                {/* 発表順プログレス：アミコン慣れ親しみ */}
                 <div
                     style={{
                         display: 'flex',
-                        gap: '8px',
+                        gap: '10px',
                         justifyContent: 'center',
                         marginBottom: '16px',
                         flexWrap: 'wrap',
                     }}
                 >
-                    {roomState.players.map((p, i) => (
-                        <div
-                            key={p.id}
-                            style={{
-                                padding: '4px 10px',
-                                borderRadius: '12px',
-                                fontSize: '0.8rem',
-                                background:
-                                    i < roomState.pIdx
-                                        ? '#6bcb77'
-                                        : i === roomState.pIdx
-                                        ? 'var(--gold, #f0c040)'
-                                        : 'rgba(255,255,255,0.1)',
-                                color: i === roomState.pIdx ? '#000' : '#fff',
-                                fontWeight: i === roomState.pIdx ? 'bold' : 'normal',
-                            }}
-                        >
-                            {p.name}
-                        </div>
-                    ))}
-                </div>
-
-                <div
-                    className="info-card presenter-card"
-                    style={{
-                        border: isPresenter
-                            ? '3px solid var(--gold, #f0c040)'
-                            : undefined,
-                    }}
-                >
-                    <div className="card-label">発表者</div>
-                    <div className="card-value">
-                        {presenter?.name}
-                        {isPresenter && ' 🎤 (あなた)'}
-                    </div>
+                    {roomState.players.map((p, i) => {
+                        const st: AvatarStatus =
+                            i < roomState.pIdx
+                                ? 'done'
+                                : i === roomState.pIdx
+                                ? 'current'
+                                : 'pending';
+                        return (
+                            <PlayerAvatar
+                                key={p.id}
+                                name={p.name}
+                                turnOrder={p.turnOrder}
+                                size={st === 'current' ? 72 : 48}
+                                isMe={p.id === myPlayer.id && st === 'current'}
+                                status={st}
+                            />
+                        );
+                    })}
                 </div>
 
                 {/* Show odai only to presenter */}
