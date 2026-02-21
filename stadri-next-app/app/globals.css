@@ -119,19 +119,121 @@ body {
     position: absolute;
     left: 0;
     background: rgba(255,255,255,0.1);
-    padding: 8px 16px;
-    font-size: 0.9rem;
+    padding: 8px 12px;
+    font-size: 1.2rem;
     border-radius: 10px;
     cursor: pointer;
     border: none;
     color: var(--text);
     backdrop-filter: blur(5px);
     transition: all 0.3s ease;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .header-back-btn:hover {
     background: rgba(255,255,255,0.2);
     transform: translateX(-2px);
+}
+
+.header-end-btn {
+    position: absolute;
+    right: 0;
+    background: rgba(255, 80, 80, 0.15);
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 1px solid rgba(255, 80, 80, 0.4);
+    color: #ff7070;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-end-btn:hover {
+    background: rgba(255, 80, 80, 0.3);
+    border-color: rgba(255, 80, 80, 0.8);
+}
+
+.end-game-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.end-game-dialog {
+    background: var(--bg-card, #1a1a2e);
+    border: 1px solid rgba(255, 80, 80, 0.4);
+    border-radius: 16px;
+    padding: 28px 24px;
+    max-width: 320px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(255, 80, 80, 0.2);
+}
+
+.end-game-dialog h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #ff7070;
+}
+
+.end-game-dialog p {
+    font-size: 0.9rem;
+    color: var(--text-muted, #aaa);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.end-game-dialog-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.end-game-cancel-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+    color: var(--text, #fff);
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+}
+
+.end-game-cancel-btn:hover {
+    background: rgba(255,255,255,0.12);
+}
+
+.end-game-confirm-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255, 80, 80, 0.8);
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.end-game-confirm-btn:hover {
+    background: rgba(255, 80, 80, 1);
 }
 
 .header-title {
@@ -144,105 +246,66 @@ body {
     letter-spacing: 2px;
 }
 
-.header-round-display {
-    position: absolute;
-    right: 0;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #000;
-    background: linear-gradient(135deg, var(--gold) 0%, #ffed4e 100%);
-    padding: 6px 16px;
-    border-radius: 20px;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-    letter-spacing: 1px;
-}
-
 .progress-container {
     width: 100%;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 8px;
-}
-
-.progress-label {
-    font-size: 0.9rem;
-    color: var(--text);
-    text-align: center;
-    opacity: 0.8;
 }
 
 .progress-bar {
     display: flex;
-    gap: 10px;
-    width: 100%;
-}
-
-.progress-segment {
-    flex: 1;
-    height: 40px;
-    background: rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(0, 242, 255, 0.3);
-    border-radius: 10px;
-    display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.progress-segment::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
+    gap: 12px;
     width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.3), transparent);
-    transition: left 0.5s ease;
 }
 
-.progress-segment.active {
-    background: linear-gradient(135deg, rgba(0, 242, 255, 0.2) 0%, rgba(0, 242, 255, 0.1) 100%);
-    border-color: var(--primary);
-    box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
-}
-
-.progress-segment.current {
-    background: linear-gradient(135deg, var(--primary) 0%, #00d9ff 100%);
-    border-color: var(--gold);
-    box-shadow: 0 0 20px rgba(0, 242, 255, 0.6);
-    animation: pulseProgress 2s ease-in-out infinite;
-}
-
-.progress-segment.current::before {
-    left: 100%;
-    animation: slideProgress 1.5s ease-in-out infinite;
-}
-
-@keyframes pulseProgress {
-    0%, 100% { 
-        box-shadow: 0 0 20px rgba(0, 242, 255, 0.6);
-    }
-    50% { 
-        box-shadow: 0 0 30px rgba(0, 242, 255, 0.8), 0 0 40px rgba(0, 242, 255, 0.4);
-    }
-}
-
-@keyframes slideProgress {
-    0% { left: -100%; }
-    100% { left: 100%; }
-}
-
-.round-number {
+.progress-round {
     font-size: 1rem;
     font-weight: bold;
-    color: var(--text);
-    z-index: 1;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
 }
 
-.progress-segment.current .round-number {
+.progress-round.completed {
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(128, 128, 128, 0.3);
+    border: 2px solid rgba(128, 128, 128, 0.5);
+}
+
+.progress-round.current {
     color: #000;
+    background: linear-gradient(135deg, var(--gold) 0%, #ffed4e 100%);
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    animation: pulseRound 2s ease-in-out infinite;
+}
+
+.progress-round.pending {
+    color: var(--primary);
+    background: rgba(0, 242, 255, 0.1);
+    border: 2px solid rgba(0, 242, 255, 0.5);
+}
+
+@keyframes pulseRound {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+    }
+}
+
+.progress-separator {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.2rem;
+    font-weight: bold;
 }
 
 .game-footer {
@@ -277,7 +340,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px 20px;
+    padding: 20px;
     box-sizing: border-box;
     position: relative;
     z-index: 1;
@@ -308,7 +371,7 @@ body {
     flex-direction: column; 
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
     animation: screenFadeIn 0.5s ease-out;
 }
 
@@ -384,7 +447,7 @@ p, li, label, div, span {
     width: auto;
     min-width: 280px;
     max-width: 95%;
-    margin: 15px auto;
+    margin: 10px auto;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -644,7 +707,7 @@ ul { display: inline-block; text-align: left; }
     border: 2px solid rgba(0, 242, 255, 0.5);
     border-radius: 15px;
     padding: 20px 25px;
-    margin: 15px 0;
+    margin: 10px 0;
     width: 90%;
     max-width: 600px;
     box-shadow: 0 4px 15px rgba(0, 242, 255, 0.2);
@@ -733,7 +796,7 @@ ul { display: inline-block; text-align: left; }
 .instruction-text {
     font-size: 1.3rem;
     color: rgba(255, 255, 255, 0.8);
-    margin: 20px 0;
+    margin: 10px 0;
 }
 
 .limit-text {
@@ -800,18 +863,19 @@ ul { display: inline-block; text-align: left; }
 
 .odai-display {
     background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(20, 20, 40, 0.7) 100%);
-    padding: 25px;
+    padding: 20px;
     border-radius: 15px;
-    margin: 20px auto;
+    margin: 10px auto;
     border: 2px solid var(--primary);
-    width: 100%;
+    width: 90%;
     max-width: 700px;
     min-height: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
+    box-sizing: border-box;
 }
 
 .odai-label {
@@ -1297,20 +1361,6 @@ ul { display: inline-block; text-align: left; }
     margin: 0 !important;
 }
 
-.odai-display {
-    background: rgba(0, 0, 0, 0.5);
-    padding: 20px;
-    border-radius: 15px;
-    margin: 20px auto;
-    border: 2px solid var(--primary);
-    width: 100%;
-    max-width: 700px;
-    min-height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .odai-display p {
     margin: 0;
     word-wrap: break-word;
@@ -1323,58 +1373,53 @@ ul { display: inline-block; text-align: left; }
 @media screen and (max-width: 768px) {
     /* Header調整 */
     .game-header {
-        padding: 10px 15px;
+        padding: 8px 12px;
+    }
+    
+    .header-content {
+        gap: 8px;
     }
     
     .header-top {
         width: 100%;
-        flex-wrap: wrap;
-        gap: 8px;
+        justify-content: center;
+        align-items: center;
     }
     
     .header-back-btn {
-        position: static;
-        font-size: 0.8rem;
-        padding: 6px 12px;
-        order: -1;
-        width: 100%;
-        text-align: center;
+        position: absolute;
+        left: 5px;
+        font-size: 1rem;
+        padding: 6px 10px;
+        min-width: 35px;
     }
     
     .header-title {
         font-size: 1.3rem;
         letter-spacing: 1px;
-        order: 1;
-        flex: 1;
-        text-align: center;
-    }
-    
-    .header-round-display {
-        position: static;
-        font-size: 0.85rem;
-        padding: 4px 12px;
-        order: 2;
     }
     
     .progress-container {
         max-width: 100%;
+        gap: 5px;
     }
     
-    .progress-label {
-        font-size: 0.8rem;
+    .progress-bar {
+        gap: 8px;
     }
     
-    .progress-segment {
-        height: 35px;
+    .progress-round {
+        font-size: 0.75rem;
+        padding: 6px 10px;
     }
     
-    .round-number {
+    .progress-separator {
         font-size: 0.9rem;
     }
     
     /* Footer調整 */
     .game-footer {
-        padding: 15px 10px;
+        padding: 10px 10px;
     }
     
     .copyright {
@@ -1383,16 +1428,23 @@ ul { display: inline-block; text-align: left; }
     
     /* コンテナとスクリーンの調整 */
     .container {
-        padding: 20px 10px;
+        padding: 5px 10px;
         align-items: center;
+        min-height: auto;
     }
     
     .screen {
         width: 100%;
-        padding: 30px 15px;
+        padding: 8px 10px;
         border-radius: 0;
         border: none;
         margin: 0 auto;
+    }
+    
+    .screen.active,
+    .screen[style*="display: block"],
+    #title-screen.active {
+        gap: 6px;
     }
     
     /* カード型UI調整 */
@@ -1402,17 +1454,18 @@ ul { display: inline-block; text-align: left; }
     }
     
     .info-card {
-        padding: 15px 20px;
+        padding: 10px 15px;
         width: 95%;
-        margin: 12px 0;
+        margin: 5px auto;
     }
     
     .card-label {
-        font-size: 0.85rem;
+        font-size: 0.75rem;
+        margin-bottom: 3px;
     }
     
     .card-value {
-        font-size: 2rem;
+        font-size: 1.6rem;
     }
     
     .card-label-inline {
@@ -1428,8 +1481,9 @@ ul { display: inline-block; text-align: left; }
     }
     
     .instruction-box {
-        padding: 15px;
+        padding: 10px;
         width: 95%;
+        margin: 5px auto;
     }
     
     .instruction-box p {
@@ -1437,7 +1491,8 @@ ul { display: inline-block; text-align: left; }
     }
     
     .instruction-text {
-        font-size: 1.1rem;
+        font-size: 1rem;
+        margin: 5px 0;
     }
     
     /* お題表示 */
@@ -1455,17 +1510,19 @@ ul { display: inline-block; text-align: left; }
     }
     
     .odai-display {
-        padding: 15px;
+        padding: 12px;
         max-width: 100%;
-        min-height: 80px;
+        min-height: 70px;
+        margin: 5px auto;
     }
     
     .odai-label {
-        font-size: 0.85rem;
+        font-size: 0.75rem;
+        margin-bottom: 3px;
     }
     
     .odai-content {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
     }
     
     /* ランキング */
@@ -1541,8 +1598,8 @@ ul { display: inline-block; text-align: left; }
     
     /* 見出しのサイズ調整 */
     h2 {
-        font-size: 2rem;
-        margin: 15px 0 20px 0;
+        font-size: 1.6rem;
+        margin: 5px 0 8px 0;
         white-space: normal;
         word-wrap: break-word;
     }
@@ -1553,16 +1610,16 @@ ul { display: inline-block; text-align: left; }
     }
     
     p, li, label, div, span {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
     
     /* ボタンの最適化 */
     .main-btn, .next-btn {
-        font-size: 1.4rem;
-        padding: 15px 25px;
-        min-width: 200px;
-        max-width: 100%;
-        margin: 10px auto;
+        font-size: 1.3rem;
+        padding: 12px 20px;
+        min-width: 180px;
+        max-width: 95%;
+        margin: 5px auto;
     }
     
     /* 戻るボタン（Headerに統合済み）
@@ -1713,20 +1770,17 @@ ul { display: inline-block; text-align: left; }
     }
     
     .header-back-btn {
-        font-size: 0.75rem;
-        padding: 5px 10px;
+        font-size: 0.9rem;
+        padding: 5px 8px;
+        min-width: 30px;
     }
     
-    .header-round-display {
-        font-size: 0.75rem;
-        padding: 3px 10px;
+    .progress-round {
+        font-size: 0.65rem;
+        padding: 5px 8px;
     }
     
-    .progress-segment {
-        height: 30px;
-    }
-    
-    .round-number {
+    .progress-separator {
         font-size: 0.8rem;
     }
     
