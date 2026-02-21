@@ -120,7 +120,7 @@ export function MultiRoomProvider({ children }: { children: ReactNode }) {
             displayTimerRef.current = setInterval(() => {
                 setDisplayTimeLeft(prev => Math.max(0, prev - 1));
             }, 1000);
-        } else if (state.phase === 'confirm' || state.phase === 'invest') {
+        } else if (state.phase === 'waiting' || state.phase === 'confirm' || state.phase === 'invest') {
             if (state.phaseStartAt && state.phaseTimeLimitSeconds) {
                 const calcRemaining = () => {
                     const elapsed = (Date.now() - new Date(state.phaseStartAt!).getTime()) / 1000;

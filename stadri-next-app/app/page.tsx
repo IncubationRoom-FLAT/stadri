@@ -30,10 +30,7 @@ export default function Home() {
               🖥️　ひとつの端末でプレイ
             </button>
             <button className="main-btn" onClick={() => router.push('/multi/create')}>
-              📱　複数の端末でプレイ（ルーム作成）
-            </button>
-            <button className="main-btn accent-btn" onClick={() => router.push('/multi/join')}>
-              🔗　複数の端末でプレイ（ルームに参加）
+              📱　複数の端末でプレイ
             </button>
             <button
               className="main-btn accent-btn"
