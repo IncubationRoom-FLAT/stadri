@@ -15,6 +15,15 @@ export interface MultiPlayer {
     investments: number[];
 }
 
+export interface StampEntry {
+    /** Unique entry ID (timestamp + random) */
+    eid: string;
+    /** Stamp image index 1–15 */
+    stampId: number;
+    fromPlayerName: string;
+    sentAt: string;
+}
+
 export interface MultiRoomState {
     phase: 'waiting' | 'confirm' | 'thinking' | 'pitch' | 'invest' | 'gacha' | 'rank';
     curR: number;
@@ -35,6 +44,8 @@ export interface MultiRoomState {
     /** When timeLeft was last persisted (ISO string) */
     timerLastUpdatedAt: string | null;
     finalRanking: { name: string; score: number }[] | null;
+    /** Stamps sent during the current pitch turn */
+    stamps: StampEntry[];
 }
 
 export interface InvLogEntry {

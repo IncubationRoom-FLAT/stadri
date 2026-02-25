@@ -99,6 +99,7 @@ export async function POST(
                             timerActive: false,
                             timeLeft: 180,
                             timerLastUpdatedAt: now,
+                            stamps: [],
                         },
                     };
                 } else {
@@ -114,6 +115,7 @@ export async function POST(
                             timerLastUpdatedAt: now,
                             phaseStartAt: now,
                             phaseTimeLimitSeconds: investTimeSec,
+                            stamps: [],
                             players: state.players.map(p => ({
                                 ...p,
                                 investDone: false,

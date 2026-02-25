@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
             timeLeft: 180,
             timerLastUpdatedAt: null,
             finalRanking: null,
+            stamps: [],
         };
 
         await pool.query(

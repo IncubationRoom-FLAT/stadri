@@ -10,7 +10,7 @@ import {
     ReactNode,
 } from 'react';
 import { useRouter } from 'next/navigation';
-import type { MultiRoomState, MultiPlayer } from '@/lib/types';
+import type { MultiRoomState, MultiPlayer, StampEntry } from '@/lib/types';
 
 const POLL_INTERVAL_MS = 1500;
 
@@ -43,6 +43,10 @@ interface MultiRoomContextType {
     displayTimeLeft: number;
     /** Call when phase timer expires */
     advancePhase: (fromPhase: string) => Promise<void>;
+    /** Send a reaction stamp during pitch phase */
+    sendStamp: (stampId: number) => Promise<void>;
+    /** Current stamps in room state */
+    stamps: StampEntry[];
 }
 
 const MultiRoomContext = createContext<MultiRoomContextType | undefined>(undefined);
@@ -258,10 +262,23 @@ export function MultiRoomProvider({ children }: { children: ReactNode }) {
         [roomId, apiCall]
     );
 
+    const sendStamp = useCallback(
+        async (stampId: number) => {
+            if (!roomId || !playerId) return;
+            await apiCall(`/api/rooms/${encodeURIComponent(roomId)}/stamp`, {
+                playerId,
+                stampId,
+            });
+        },
+        [roomId, playerId, apiCall]
+    );
+
     const myPlayer =
         roomState && playerId
             ? roomState.players.find(p => p.id === playerId) ?? null
             : null;
+
+    const stamps: StampEntry[] = roomState?.stamps ?? [];
 
     return (
         <MultiRoomContext.Provider
@@ -283,6 +300,8 @@ export function MultiRoomProvider({ children }: { children: ReactNode }) {
                 refreshState,
                 displayTimeLeft,
                 advancePhase,
+                sendStamp,
+                stamps,
             }}
         >
             {children}
